@@ -1,0 +1,61 @@
+# Part 1 真實資料實測：研究問題與「人為判斷」
+#
+# 請組員依課本自己判斷並填寫每一題的 judgment（Claude 不可代填）。
+# 填完後，網頁會把這裡的判斷和 Skill 的判斷並排比較。
+#
+# 可填的值：
+#   structure: independent（獨立）、matched_pairs（配對）、repeated_measures（重複測量）、clustered（叢集）
+#   type:      binary（二元）、nominal（名目）、ordinal（有序）、continuous（連續）、count（計數）
+#   method_id: 從 skill/knowledge/methods.yml 選一個方法代號，Part 1 相關的有：
+#              crosstab（列聯表、卡方、Fisher、勝算比）、ordinal_trend（趨勢檢定 M²）、
+#              three_way（三因子表、CMH）；也可以選其他 Part 的方法
+#   method:    用自己的話描述方法，例如「列聯表＋卡方檢定」
+#   book_ref:  依據的課本節號，例如 §2.4
+#   reason:    為什麼選這個方法（一兩句話）
+
+data: data/uci-student/student_por.csv
+
+# 判斷紀錄（2026-10-06）：由組長 r26144128-create 決定。組長原本判斷三題都用「獨立、二元、卡方檢定」；
+# 與 Claude 討論後，依 Claude 指出的課本章節修正 q2（studytime 有 4 個有順序的類別，§1.1.2、§2.5）
+# 與 q3（題目要求控制學校，§2.7）。q1 維持原判斷。
+
+questions:
+  - id: q1
+    question: 有交往對象的學生，及格率比較低嗎？
+    variables: {outcome: pass, explanatory: romantic}
+    judgment:
+      structure: independent
+      outcome_type: binary
+      explanatory_type: binary
+      method_id: crosstab
+      method: 2×2 列聯表 + 卡方檢定
+      book_ref: §2.2–2.4
+      reason: 每位學生一列、彼此獨立；pass 與 romantic 都是二元，用 2×2 列聯表比較兩組及格比例並做卡方獨立性檢定
+      expected_conclusion:   # 預期結論（填完計算後也可以補）
+
+  - id: q2
+    question: 每週讀書時間越長，及格率越高嗎？
+    variables: {outcome: pass, explanatory: studytime}
+    judgment:
+      structure: independent
+      outcome_type: binary
+      explanatory_type: ordinal
+      method_id: ordinal_trend
+      method: 趨勢檢定 M²（Cochran–Armitage）
+      book_ref: §2.5
+      reason: studytime 有 4 個有順序的類別；卡方檢定會忽略順序，趨勢檢定利用順序、有線性趨勢時檢定力較高
+      settings: 分數用各類讀書時數的中點 1, 3.5, 7.5, 12（組長於 Skill 詢問時選擇，§2.5.4），並以等距 1–4 做敏感度對照
+      expected_conclusion:
+
+  - id: q3
+    question: 控制學校之後，交往和及格的關係還在嗎？
+    variables: {outcome: pass, explanatory: romantic, control: school}
+    judgment:
+      structure: independent
+      outcome_type: binary
+      explanatory_type: binary
+      method_id: three_way
+      method: 依學校分層的三因子表 + CMH 檢定
+      book_ref: §2.7、§4.3.4
+      reason: 題目要求控制學校，需比較各校的條件勝算比與合併的邊際勝算比，並檢定控制學校後是否仍有關聯
+      expected_conclusion:

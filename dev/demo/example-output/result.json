@@ -1,0 +1,59 @@
+{
+  "method": "trend",
+  "method_label": "Linear-by-linear association 檢定（M²）",
+  "book_ref": "§2.5",
+  "tier": "A",
+  "estimates": [],
+  "tests": [
+    {
+      "test": "Linear-by-linear association (M2)",
+      "statistic": 101.367517212491,
+      "df": 1,
+      "p_value": 7.64065290115555e-24,
+      "book_ref": "§2.5.1"
+    },
+    {
+      "test": "Pearson X2 (ignores order)",
+      "statistic": 106.175058541183,
+      "df": 4,
+      "p_value": 4.75856628384149e-22,
+      "book_ref": "§2.4.3"
+    }
+  ],
+  "tables": {
+    "counts": {
+      "rows": ["Low", "Medium", "High"],
+      "cols": ["Low", "Medium", "High"],
+      "values": [
+        [282, 170, 175],
+        [206, 189, 264],
+        [79, 87, 229]
+      ]
+    },
+    "row_proportions": {
+      "rows": ["Low", "Medium", "High"],
+      "cols": ["Low", "Medium", "High"],
+      "values": [
+        [0.4498, 0.2711, 0.2791],
+        [0.3126, 0.2868, 0.4006],
+        [0.2, 0.2203, 0.5797]
+      ]
+    }
+  },
+  "warnings": [],
+  "facts": ["樣本數 n = 1681；Infl 有 3 類，Sat 有 3 類。", "方法：Linear-by-linear association 檢定（Infl 與 Sat 都是有序變數）。", "Infl 的分數：1, 2, 3；Sat 的分數：1, 2, 3。", "相關係數 R = 0.2456；M² = (n − 1)R² = 101.37（df = 1），P = < 0.001。", "單尾檢定（Infl 越高，Sat 越高）：M = 10.07，P = < 0.001。", "對照：忽略順序的卡方檢定 X² = 106.18（df = 4），P = < 0.001。有真正的線性趨勢時，M² 只用 1 個自由度，通常檢定力較高（§2.5.3）。", "使用等距分數。若類別間距離不相等，應依實際意義設定分數並做敏感度分析（§2.5.4）。"],
+  "notes": {
+    "variables": {
+      "x": "Infl",
+      "y": "Sat"
+    },
+    "scores": {
+      "x": [1, 2, 3],
+      "y": [1, 2, 3]
+    },
+    "trend_type": "linear_by_linear",
+    "reminder": "M² 只檢定「線性趨勢」；R 的大小受邊際分配影響，不適合單獨描述關聯強度（§2.5.2）。"
+  },
+  "plots": "trend.png",
+  "report": "分析報告_02_trend_housing_trend.md"
+}

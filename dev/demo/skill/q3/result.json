@@ -1,0 +1,163 @@
+{
+  "method": "stratified",
+  "method_label": "三因子表：分層勝算比、Simpson 悖論與 CMH 檢定",
+  "book_ref": "§2.7, §4.3.4",
+  "tier": "A",
+  "estimates": [
+    {
+      "measure": "conditional odds ratio (school = GP)",
+      "estimate": 0.647802197802198,
+      "lower": 0.315635167003862,
+      "upper": 1.32820579847875,
+      "ci_method": "score",
+      "book_ref": "§2.7.4"
+    },
+    {
+      "measure": "conditional odds ratio (school = MS)",
+      "estimate": 0.7265625,
+      "lower": 0.410039160901341,
+      "upper": 1.28742109716019,
+      "ci_method": "score",
+      "book_ref": "§2.7.4"
+    },
+    {
+      "measure": "marginal odds ratio",
+      "estimate": 0.636419149975574,
+      "lower": 0.414351271543043,
+      "upper": 0.977502332615764,
+      "ci_method": "score",
+      "book_ref": "§2.7.4"
+    },
+    {
+      "measure": "common odds ratio (logistic model)",
+      "estimate": 0.6954846455158,
+      "lower": 0.443131163830886,
+      "upper": 1.09520276218048,
+      "ci_method": "profile likelihood",
+      "book_ref": "§4.3.4"
+    }
+  ],
+  "tests": [
+    {
+      "test": "LR test of conditional independence (beta = 0)",
+      "statistic": 2.46438678332503,
+      "df": 1,
+      "p_value": 0.116453142760895,
+      "book_ref": "§4.3.4"
+    },
+    {
+      "test": "Wald test (beta = 0)",
+      "statistic": 2.48587046443833,
+      "df": 1,
+      "p_value": 0.114872778051857,
+      "book_ref": "§4.3.4"
+    },
+    {
+      "test": "Cochran-Mantel-Haenszel (score test, beta = 0)",
+      "statistic": 2.49069215642824,
+      "df": 1,
+      "p_value": 0.114521349849821,
+      "book_ref": "§4.3.4"
+    },
+    {
+      "test": "Homogeneous association (residual deviance)",
+      "statistic": 0.0586703648690274,
+      "df": 1,
+      "p_value": 0.808609960197386,
+      "book_ref": "§4.3.4, §5.2.1"
+    }
+  ],
+  "tables": {
+    "partial_tables": [
+      {
+        "romantic": "yes",
+        "pass": "pass",
+        "school": "GP",
+        "count": 131
+      },
+      {
+        "romantic": "no",
+        "pass": "pass",
+        "school": "GP",
+        "count": 260
+      },
+      {
+        "romantic": "yes",
+        "pass": "fail",
+        "school": "GP",
+        "count": 14
+      },
+      {
+        "romantic": "no",
+        "pass": "fail",
+        "school": "GP",
+        "count": 18
+      },
+      {
+        "romantic": "yes",
+        "pass": "pass",
+        "school": "MS",
+        "count": 62
+      },
+      {
+        "romantic": "no",
+        "pass": "pass",
+        "school": "MS",
+        "count": 96
+      },
+      {
+        "romantic": "yes",
+        "pass": "fail",
+        "school": "MS",
+        "count": 32
+      },
+      {
+        "romantic": "no",
+        "pass": "fail",
+        "school": "MS",
+        "count": 36
+      }
+    ],
+    "strata": [
+      {
+        "stratum": "GP",
+        "n": 423,
+        "p1": 0.903448275862069,
+        "p2": 0.935251798561151,
+        "odds_ratio": 0.647802197802198,
+        "lower": 0.315635167003862,
+        "upper": 1.32820579847875
+      },
+      {
+        "stratum": "MS",
+        "n": 226,
+        "p1": 0.659574468085106,
+        "p2": 0.727272727272727,
+        "odds_ratio": 0.7265625,
+        "lower": 0.410039160901341,
+        "upper": 1.28742109716019
+      },
+      {
+        "stratum": "合併（忽略 school）",
+        "n": 649,
+        "p1": 0.807531380753138,
+        "p2": 0.868292682926829,
+        "odds_ratio": 0.636419149975574,
+        "lower": 0.414351271543043,
+        "upper": 0.977502332615764
+      }
+    ]
+  },
+  "warnings": [],
+  "facts": ["樣本數 n = 649；比較 romantic（yes vs no）在 pass=pass 的比例，控制 school（2 層）。", "school=GP：yes 組 90.3%、no 組 93.5%，條件勝算比 = 0.65。", "school=MS：yes 組 66.0%、no 組 72.7%，條件勝算比 = 0.73。", "忽略 school 合併後：yes 組 80.8%、no 組 86.8%，邊際勝算比 = 0.64。", "控制 school 後的共同勝算比（logistic 模型）= 0.70，95% CI [0.44, 1.10]。", "條件獨立檢定：概似比 LR = 2.46（df = 1），P = 0.116；CMH = 2.49，P = 0.115。", "同質關聯檢定（各層勝算比是否相同）：deviance = 0.06（df = 1），P = 0.809。"],
+  "notes": {
+    "variables": {
+      "x": "romantic",
+      "y": "pass",
+      "z": "school"
+    },
+    "success": "pass",
+    "reminder": "控制變數只能排除「有測量到的」第三變數；觀察資料中仍可能有其他混淆因子（§2.7）。"
+  },
+  "plots": "stratified.png"
+}

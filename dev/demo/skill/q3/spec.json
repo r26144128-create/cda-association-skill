@@ -1,0 +1,17 @@
+{
+  "question": "控制學校（school）之後，有沒有交往（romantic）和及格（pass）的關係還在嗎？",
+  "structure": "independent",
+  "types": {"romantic": "binary", "pass": "binary", "school": "binary"},
+  "method_id": "three_way",
+  "reason": "X、Y 皆為二元、加一個二元控制變數 school、每列為獨立學生，用分層 2×2 表的條件勝算比與 CMH 檢定（§2.7、§4.3.4）",
+  "analysis": "stratified",
+  "x": "romantic",
+  "y": "pass",
+  "z": "school",
+  "count": null,
+  "success": "pass",
+  "ordinal": [],
+  "design": "cross-sectional",
+  "levels": {"romantic": ["yes", "no"], "pass": ["pass", "fail"], "school": ["GP", "MS"]},
+  "conf_level": 0.95
+}

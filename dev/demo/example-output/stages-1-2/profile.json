@@ -1,0 +1,75 @@
+{
+  "n_rows": 2201,
+  "n_cols": 4,
+  "variables": [
+    {
+      "name": "Class",
+      "n": 2201,
+      "n_missing": 0,
+      "n_unique": 4,
+      "type_guess": "nominal",
+      "needs_confirmation": false,
+      "reason": "文字類別，看起來沒有順序",
+      "levels": {
+        "1st": 325,
+        "2nd": 285,
+        "3rd": 706,
+        "Crew": 885
+      },
+      "examples": ["3rd", "1st", "2nd", "Crew"],
+      "range": null
+    },
+    {
+      "name": "Sex",
+      "n": 2201,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "Female": 470,
+        "Male": 1731
+      },
+      "examples": ["Male", "Female"],
+      "range": null
+    },
+    {
+      "name": "Age",
+      "n": 2201,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "Adult": 2092,
+        "Child": 109
+      },
+      "examples": ["Child", "Adult"],
+      "range": null
+    },
+    {
+      "name": "Survived",
+      "n": 2201,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "No": 1490,
+        "Yes": 711
+      },
+      "examples": ["No", "Yes"],
+      "range": null
+    }
+  ],
+  "structure": {
+    "n_rows": 2201,
+    "hints": [],
+    "default": "independent",
+    "note": "資料本身無法證明觀察值彼此獨立。第 1–7 章的方法都假設獨立（§1.1.3），請使用者確認每一列是否為不同的獨立個體。"
+  },
+  "file": "C:/Users/Administrator/Desktop/categorical analysis/cda-association-skill/example_data/01_crosstab_titanic.csv"
+}

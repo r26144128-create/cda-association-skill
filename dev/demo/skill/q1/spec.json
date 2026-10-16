@@ -1,0 +1,16 @@
+{
+  "question": "有交往對象（romantic）的學生，及格率（pass）比較低嗎？",
+  "structure": "independent",
+  "types": {"romantic": "binary", "pass": "binary"},
+  "method_id": "crosstab",
+  "reason": "兩個二元變數、每列為獨立學生，用 2×2 列聯表比較比例並做卡方獨立性檢定（§2.1–2.4）",
+  "analysis": "crosstab",
+  "x": "romantic",
+  "y": "pass",
+  "count": null,
+  "success": "pass",
+  "ordinal": [],
+  "design": "cross-sectional",
+  "levels": {"romantic": ["yes", "no"], "pass": ["pass", "fail"]},
+  "conf_level": 0.95
+}

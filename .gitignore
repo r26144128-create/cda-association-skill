@@ -1,0 +1,11 @@
+*.pdf
+.Rhistory
+.RData
+.Rproj.user/
+_freeze/
+*_files/
+.quarto/
+skill-output/
+__pycache__/
+# Textbook data: downloaded by dev/tests/download-data.R, not redistributed
+dev/tests/data/

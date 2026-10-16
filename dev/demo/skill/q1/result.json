@@ -1,0 +1,112 @@
+{
+  "method": "crosstab",
+  "method_label": "列聯表分析：卡方獨立性檢定（chi-squared test of independence）",
+  "book_ref": "§2.1–2.4, §2.6",
+  "tier": "A",
+  "estimates": [
+    {
+      "measure": "difference of proportions",
+      "estimate": -0.0607613021736911,
+      "lower": -0.12317656859754,
+      "upper": -0.00304144331235906,
+      "ci_method": "score",
+      "book_ref": "§2.2.2"
+    },
+    {
+      "measure": "relative risk",
+      "estimate": 0.930022095811198,
+      "lower": 0.860332151966812,
+      "upper": 0.996350916725424,
+      "ci_method": "score",
+      "book_ref": "§2.2.3"
+    },
+    {
+      "measure": "odds ratio",
+      "estimate": 0.636419149975574,
+      "lower": 0.414351271543043,
+      "upper": 0.977502332615764,
+      "ci_method": "score",
+      "book_ref": "§2.3.3"
+    }
+  ],
+  "tests": [
+    {
+      "test": "Pearson X2",
+      "statistic": 4.27669476774609,
+      "df": 1,
+      "p_value": 0.0386384142006222,
+      "book_ref": "§2.4.3"
+    },
+    {
+      "test": "Likelihood-ratio G2",
+      "statistic": 4.1814703207838,
+      "df": 1,
+      "p_value": 0.0408682307737245,
+      "book_ref": "§2.4.3"
+    },
+    {
+      "test": "Fisher exact (two-sided)",
+      "statistic": null,
+      "df": null,
+      "p_value": 0.0427018427783194,
+      "book_ref": "§2.6"
+    },
+    {
+      "test": "Fisher mid-P (two-sided)",
+      "statistic": null,
+      "df": null,
+      "p_value": 0.0415511765851228,
+      "book_ref": "§2.6"
+    }
+  ],
+  "tables": {
+    "counts": {
+      "rows": ["yes", "no"],
+      "cols": ["pass", "fail"],
+      "values": [
+        [193, 46],
+        [356, 54]
+      ]
+    },
+    "expected": {
+      "rows": ["yes", "no"],
+      "cols": ["pass", "fail"],
+      "values": [
+        [202.17, 36.83],
+        [346.83, 63.17]
+      ]
+    },
+    "row_proportions": {
+      "rows": ["yes", "no"],
+      "cols": ["pass", "fail"],
+      "values": [
+        [0.8075, 0.1925],
+        [0.8683, 0.1317]
+      ]
+    },
+    "standardized_residuals": {
+      "rows": ["yes", "no"],
+      "cols": ["pass", "fail"],
+      "values": [
+        [-2.07, 2.07],
+        [2.07, -2.07]
+      ]
+    }
+  },
+  "warnings": [
+    {
+      "code": "OR_NOT_RR",
+      "message": "比例不算小，勝算比不能當成相對風險來解釋（「幾倍的機率」要看 RR）。",
+      "book_ref": "§2.3.4"
+    }
+  ],
+  "facts": ["樣本數 n = 649；romantic 有 2 類，pass 有 2 類。", "Pearson 卡方 X² = 4.28（df = 1），P = 0.039；概似比 G² = 4.18。", "獨立假設下的期望次數最小為 36.83。", "Fisher 精確檢定雙尾 P = 0.043；mid-P = 0.042（Fisher 檢定較保守，書中建議參考 mid-P）。", "2×2 表四格的標準化殘差絕對值相同，以其中一格為代表：romantic=yes、pass=pass（-2.07，實際次數比獨立時預期的少）。", "pass=pass 的比例：yes 組為 0.808（193/239），no 組為 0.868（356/410）。", "比例差（yes − no）= -0.0608，95% CI [-0.1232, -0.0030]。", "相對風險 RR（yes / no）= 0.93，95% CI [0.86, 1.00]。", "勝算比 OR（yes 相對於 no，pass=pass 的勝算）= 0.64，95% CI [0.41, 0.98]。"],
+  "notes": {
+    "variables": {
+      "x": "romantic",
+      "y": "pass"
+    },
+    "reminder": "卡方檢定只回答「有沒有證據顯示有關聯」，不代表關聯有多強；強度要看比例、勝算比與殘差（§2.4.7）。"
+  },
+  "plots": ["conditional_props.png", "residuals.png"]
+}
