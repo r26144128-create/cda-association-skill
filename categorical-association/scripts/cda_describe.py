@@ -264,7 +264,7 @@ def overview_md(data, profile, data_name):
         lines.append("- 看起來是**已彙整的次數表**：`%s` 可能是次數欄，合計 %s 個觀察值。下表的次數已用它加權，需要使用者確認。"
                      % (freq_cols[0], fmt_count(w.sum())))
     else:
-        lines.append("- 看起來是**一列一個觀察值**的原始資料")
+        lines.append("- 看起來是**一列一筆紀錄**的原始資料（不是次數表）")
     lines += ["- 需要確認：" + h["question"] for h in profile["structure"]["hints"]]
     lines += ["", "## 各變數", "",
               "| 欄位 | 型態（猜測，需確認） | 缺失 | 類別與次數（比例）／數值摘要 |",

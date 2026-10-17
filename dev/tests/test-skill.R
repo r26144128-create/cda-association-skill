@@ -221,3 +221,11 @@ test_that("profile_data.R writes the overview table; describe_question.R writes 
   expect_equal(chk$cells_expected_below_5, 0)
   expect_true(all(file.exists(file.path(dir, c("bar_Gender.png", "bar_Admit.png", "bar_Dept.png", "relation.png")))))
 })
+
+test_that("04 paired student courses: each student appears twice, so the profile flags repeated measures", {
+  p <- cda_profile(read_data(demo_file("04_paired_student_courses.csv")))
+  hint <- p$structure$hints[[1]]
+  expect_equal(hint$type, "repeated_measures")
+  expect_equal(as.character(hint$columns), c("student_id", "course"))
+  expect_equal(p$structure$default, "needs_confirmation")
+})

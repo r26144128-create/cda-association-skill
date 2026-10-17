@@ -22,7 +22,7 @@ run_both <- function(stage, data, question = NULL) {
 read_md <- function(dir) readLines(list.files(dir, pattern = "\\.md$", full.names = TRUE), encoding = "UTF-8")
 
 data_files <- c(file.path(root, "example_data", c("01_crosstab_titanic.csv", "02_trend_housing.csv",
-                                                  "03_stratified_berkeley.csv")),
+                                                  "03_stratified_berkeley.csv", "04_paired_student_courses.csv")),
                 file.path(root, "dev", "demo", "student_por.csv"),
                 file.path(root, "dev", "tests", "data", c("Political.dat", "Crabs.dat", "Abortion.dat",
                                                           "Envir_opinions.dat")))

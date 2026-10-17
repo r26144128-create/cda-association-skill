@@ -43,7 +43,7 @@ cda_overview_md <- function(data, profile, data_name) {
     sprintf("- %d 列、%d 欄", profile$n_rows, profile$n_cols),
     if (!is.null(w)) sprintf("- 看起來是**已彙整的次數表**：`%s` 可能是次數欄，合計 %s 個觀察值。下表的次數已用它加權，需要使用者確認。",
                               freq_cols, format(sum(w, na.rm = TRUE), big.mark = ",", trim = TRUE))
-    else "- 看起來是**一列一個觀察值**的原始資料",
+    else "- 看起來是**一列一筆紀錄**的原始資料（不是次數表）",
     vapply(profile$structure$hints, function(h) paste0("- 需要確認：", h$question), ""))
 
   c(sprintf("# 資料總覽：%s", data_name), "",

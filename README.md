@@ -8,6 +8,8 @@
 方法依據 Agresti《An Introduction to Categorical Data Analysis》第 3 版第 1–2 章。
 本 skill 是類別資料分析期中報告的 Part 1（關聯分析）；Part 2（類別模型）、Part 3（相關資料）是組員各自的 skill。
 
+> **第一次使用？** 照 [實作教學](實作教學.md) 一步一步在 claude.ai 安裝並實測。
+
 ## 涵蓋的方法
 
 | 這個 skill 做 | 不做（會轉介） |
@@ -28,6 +30,7 @@
 | `methods.qmd`／`.html` | 方法比較：比例差、相對風險、勝算比該報哪個，卡方、Fisher 與趨勢檢定的差別 |
 | `example_data/` | 示範資料，見下方「示範資料」 |
 | `dev/` | 開發紀錄：自動測試、真實資料驗證、AI 使用紀錄 |
+| `實作教學.md` | 給第一次使用的人：在 claude.ai 安裝 Skill 並用示範資料實測的步驟 |
 
 ### skill 資料夾結構
 
@@ -90,6 +93,7 @@ claude.ai 網頁版：在「設定 → 功能」開啟程式碼執行，再到�
 | `01_crosstab_titanic.csv` | 鐵達尼號 2201 位乘客的艙等、性別、年齡、是否存活（R 內建 `Titanic`） | 原始資料（一人一列） | 列聯表（`crosstab`） |
 | `02_trend_housing.csv` | 哥本哈根 1681 戶住戶對管理的影響力 × 居住滿意度（R 套件 MASS 的 `housing`，合併房型與接觸程度） | 長格式＋次數欄（`Freq`） | 趨勢檢定（`trend`） |
 | `03_stratified_berkeley.csv` | 1973 年柏克萊研究所 6 個科系、4526 位申請者的性別與錄取結果（R 內建 `UCBAdmissions`） | 長格式＋次數欄（`Freq`） | 分層分析（`stratified`） |
+| `04_paired_student_courses.csv` | 358 位葡萄牙高中生的數學與葡萄牙文是否及格，**每人 2 列**（UCI 學生資料） | 原始資料（同一人多列） | **不適合**：資料不獨立，示範 Skill 會偵測並拒絕、轉介 McNemar |
 
 ## 試用示範資料
 
@@ -100,12 +104,14 @@ claude.ai 網頁版：在「設定 → 功能」開啟程式碼執行，再到�
 | `01` | 鐵達尼號上女性的存活率比男性高嗎？ | 每一列是不同的乘客；成功 = 存活（Yes）；用推薦的 | 存活率 73.2% vs 21.2%；X² = 456.87，P < 0.001；比例差 0.52、相對風險 3.45、勝算比 10.15 |
 | `02` | 住戶對管理的影響力越大，居住滿意度越高嗎？ | 兩個都是有序（Low < Medium < High）；不是配對，是同一戶回答的兩個不同問題；用推薦的 | Linear-by-linear association 檢定：M² = 101.37（df = 1），P < 0.001；忽略順序的 X² = 106.18（df = 4） |
 | `03` | 柏克萊研究所錄取有性別差異嗎？控制科系之後呢？ | 每一列是一群不同的申請者；成功 = 錄取（Admitted）；科系是同時影響申請與錄取的變數，要控制；用推薦的 | 合併看勝算比 1.84（男生較易錄取）；控制科系後共同勝算比 0.90（95% CI 0.77–1.06），CMH 的 P = 0.217；警告：各科系勝算比方向不一致、同質性檢定 P = 0.001，要逐科系報告 |
+| `04` | 數學和葡萄牙文的及格率一樣嗎？ | 對，每個學生都有兩列，一列數學、一列葡萄牙文 | 第 1 步就提醒 `student_id` 重複；卡方／Fisher 標 ❌（同一學生的兩次觀察不獨立），建議改用 McNemar 檢定並轉介相關資料的 Skill，不會給出卡方結果 |
 
 示範重點：
 
 - `01` 的第 1 步只會給總表；說出問題後，第 2 步才畫性別與存活的圖。
 - `02` 的兩欄類別都是 Low／Medium／High，skill 會懷疑是配對資料而停下來問。這是刻意保留的示範：資料證明不了的事，skill 一定要問人。
 - `03` 合併來看男生較易錄取，分科系後差異幾乎消失，是控制變數改變結論的經典例子。
+- `04` 看起來是普通的「科目 × 及格」表，但每個學生出現兩次。這是示範「不適合」的案例：skill 要自己發現資料不獨立、停下來問、拒絕做卡方並轉介。
 
 另外也可以用 `01` 試其他問題，例如「艙等和存活有關嗎？」（4×2 表、看標準化殘差），或「控制年齡（大人／小孩）後，性別和存活還有關嗎？」（分層分析）。
 
@@ -134,6 +140,7 @@ Rscript -e "testthat::test_dir('dev/tests')"
 - `example_data/01_crosstab_titanic.csv`：R 內建資料集 `Titanic`（R Core Team, 2026），由次數表展開成一人一列。原始資料：Dawson, R. J. M. (1995). The "unusual episode" data revisited. *Journal of Statistics Education*, 3(3).
 - `example_data/02_trend_housing.csv`：R 套件 MASS 的 `housing`（Venables & Ripley, 2002），把房型與接觸程度合併加總。原始資料：Madsen, M. (1976). Statistical analysis of multiple contingency tables. Two examples. *Scandinavian Journal of Statistics*, 3, 97–106.
 - `example_data/03_stratified_berkeley.csv`：R 內建資料集 `UCBAdmissions`（R Core Team, 2026），轉成長格式。原始資料：Bickel, P. J., Hammel, E. A., & O'Connell, J. W. (1975). Sex bias in graduate admissions: Data from Berkeley. *Science*, 187(4175), 398–404.
+- `example_data/04_paired_student_courses.csv`：Cortez, P. (2008). Student Performance [Dataset]. UCI Machine Learning Repository. <https://doi.org/10.24432/C5TG7T>。授權：[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。**修改**：用原作者提供的配對程式找出數學與葡萄牙文兩科都修的學生，只保留能唯一配對的 358 位並編代號 `student_id`；轉成每人 2 列的長格式；新增 `pass`（G3 ≥ 10）；只保留 `student_id`、`course`、`school`、`sex`、`pass` 五欄。
 - `dev/demo/student_por.csv`：Cortez, P. (2008). Student Performance [Dataset]. UCI Machine Learning Repository. <https://doi.org/10.24432/C5TG7T>。授權：[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。**修改**：由分號分隔改成逗號分隔，並新增 `pass` 欄（G3 ≥ 10 為 pass，否則 fail）；其餘內容未更動。相關論文：Cortez, P., & Silva, A. (2008). Using data mining to predict secondary school student performance. In *Proceedings of 5th Future Business Technology Conference* (pp. 5–12).
 
 ### 不收錄、由測試時下載的資料
