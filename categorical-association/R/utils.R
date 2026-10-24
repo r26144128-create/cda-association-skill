@@ -22,6 +22,13 @@ cda_warning <- function(code, message, book_ref) {
   list(code = code, message = message, book_ref = book_ref)
 }
 
+# Categories in character-code order (numbers numerically), so the order shown to the
+# user does not depend on the computer's locale and matches the Python version.
+code_order_factor <- function(v) {
+  if (is.factor(v)) return(v)
+  factor(v, levels = sort(unique(v[!is.na(v)]), method = "radix"))
+}
+
 fmt_num <- function(x, digits = 3) formatC(x, digits = digits, format = "f")
 
 fmt_p <- function(p) {

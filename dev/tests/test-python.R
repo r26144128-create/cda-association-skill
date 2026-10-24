@@ -82,3 +82,48 @@ test_that("stage 2: both versions refuse a column that does not exist", {
   expect_equal(c(out$r_status, out$py_status), c(1, 1))
   expect_match(jsonlite::fromJSON(file.path(out$dir, "py", "check.json"))$error, "找不到欄位：romance")
 })
+
+# ---- Stage 4: run_analysis.py (web mode) must give the same result.json as run_analysis.R ----
+
+test_that("stage 4: Python analysis matches R on crosstab, trend, stratified, edge cases and refusals", {
+  skip_if_not(has_python, "Python with pandas and matplotlib not available")
+  skip_if_not(system2(python, c("-c", shQuote("import scipy")), stdout = FALSE, stderr = FALSE) == 0, "scipy not available")
+  student <- file.path(root, "dev", "demo", "student_por.csv")
+  ex <- function(f) file.path(root, "example_data", f)
+  tmp_csv <- function(df) { p <- tempfile(fileext = ".csv"); write.csv(df, p, row.names = FALSE); p }
+  tea <- tmp_csv(data.frame(poured = rep(c("milk", "tea"), each = 4),
+                            guess = c("milk", "milk", "milk", "tea", "milk", "tea", "tea", "tea")))
+  cc <- tmp_csv(data.frame(smoker = c("yes", "yes", "no", "no"), cancer = c("case", "control", "case", "control"),
+                           n = c(688, 650, 21, 59)))
+  sparse <- tmp_csv(data.frame(a = rep(c("p", "q", "r"), 3), b = rep(c("u", "v", "w"), each = 3),
+                               n = c(60, 60, 15, 60, 60, 15, 1, 2, 1)))
+  empty <- tmp_csv(data.frame(g = rep(c("a", "b", "c"), each = 2), y = rep(c("yes", "no"), 3), n = c(10, 5, 0, 7, 0, 0)))
+  cases <- list(
+    list(student, '{"analysis":"crosstab","x":"romantic","y":"pass","success":"pass","design":"cross-sectional","levels":{"romantic":["yes","no"],"pass":["pass","fail"]}}'),
+    list(student, '{"analysis":"trend","x":"studytime","y":"pass","success":"pass","ordinal":["studytime"],"x_scores":[1,3.5,7.5,12],"levels":{"studytime":["1","2","3","4"],"pass":["pass","fail"]}}'),
+    list(student, '{"analysis":"stratified","x":"romantic","y":"pass","z":"school","success":"pass","levels":{"romantic":["yes","no"],"pass":["pass","fail"]}}'),
+    list(ex("01_crosstab_titanic.csv"), '{"analysis":"crosstab","x":"Sex","y":"Survived","success":"Yes","levels":{"Sex":["Female","Male"],"Survived":["Yes","No"]}}'),
+    list(ex("01_crosstab_titanic.csv"), '{"analysis":"crosstab","x":"Class","y":"Survived"}'),
+    list(ex("02_trend_housing.csv"), '{"analysis":"trend","x":"Infl","y":"Sat","count":"Freq","ordinal":["Infl","Sat"],"levels":{"Infl":["Low","Medium","High"],"Sat":["Low","Medium","High"]}}'),
+    list(ex("03_stratified_berkeley.csv"), '{"analysis":"stratified","x":"Gender","y":"Admit","z":"Dept","count":"Freq","success":"Admitted","levels":{"Gender":["Male","Female"],"Admit":["Admitted","Rejected"]}}'),
+    list(mal_file, '{"analysis":"trend","x":"alcohol","y":"malformation","count":"count","ordinal":["alcohol"],"x_scores":[0,0.5,1.5,4,7],"success":"present","levels":{"alcohol":["0","<1","1-2","3-5",">=6"],"malformation":["present","absent"]}}'),
+    list(tea, '{"analysis":"crosstab","x":"poured","y":"guess"}'),
+    list(cc, '{"analysis":"crosstab","x":"smoker","y":"cancer","count":"n","design":"case-control"}'),
+    list(sparse, '{"analysis":"crosstab","x":"a","y":"b","count":"n"}'),
+    list(empty, '{"analysis":"crosstab","x":"g","y":"y","count":"n"}'),
+    list(student, '{"analysis":"crosstab","x":"romantic","y":"passed","success":"pass","recode":{"passed":{"from":"G3","breaks":[10],"labels":["fail","pass"]}}}'),
+    list(student, '{"analysis":"logistic","y":"pass","x":["sex"]}'),
+    list(student, '{"analysis":"trend","x":"sex","y":"studytime","ordinal":["studytime"]}'))
+  for (q in cases) {
+    q_file <- tempfile(fileext = ".json")
+    writeLines(q[[2]], q_file, useBytes = TRUE)
+    out <- run_both("run_analysis", q[[1]], q_file)
+    expect_equal(out$py_status, out$r_status, info = q[[2]])
+    r <- jsonlite::fromJSON(file.path(out$dir, "r", "result.json"))
+    p <- jsonlite::fromJSON(file.path(out$dir, "py", "result.json"))
+    expect_equal(p, r, tolerance = 1e-6, info = q[[2]])
+    if (is.null(r$error)) {
+      expect_identical(read_md(file.path(out$dir, "py")), read_md(file.path(out$dir, "r")), info = q[[2]])
+    }
+  }
+})

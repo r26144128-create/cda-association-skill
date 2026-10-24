@@ -31,20 +31,20 @@ description: 分析兩個類別變數之間有沒有關聯（列聯表、卡方�
 
 | | 模式 1：有 R | 模式 2：沒有 R |
 |---|---|---|
-| 環境 | Claude Code、本機 | claude.ai 網頁版，或 `Rscript` 不能用 |
-| 階段 1–2（總表、圖） | `Rscript scripts/profile_data.R`、`Rscript scripts/describe_question.R` | `python scripts/profile_data.py`、`python scripts/describe_question.py`（參數與輸出檔都和 R 版相同） |
-| 階段 3（判斷） | 照常 | 照常 |
-| 階段 4（分析） | `Rscript scripts/run_analysis.R` | 把 `references/methods.md` 裡對應方法的 **R 程式碼**依使用者的欄位名稱改好，交給使用者在 R／RStudio 執行，請他把輸出貼回來 |
-| 階段 5（解釋） | 依 `result.json` | 依使用者貼回的輸出 |
+| 環境 | Claude Code、本機 | claude.ai 網頁版、桌面版，或 `Rscript` 不能用 |
+| 階段 1 | `Rscript scripts/profile_data.R` | `python scripts/profile_data.py` |
+| 階段 2 | `Rscript scripts/describe_question.R` | `python scripts/describe_question.py` |
+| 階段 4 | `Rscript scripts/run_analysis.R` | `python scripts/run_analysis.py` |
+
+兩種模式的參數、輸出檔名與 `result.json` 內容都相同：Python 版是 R 版逐行對照改寫的，自動測試會逐項比對兩邊的數字、結論句與警告，所以階段 3、5 的做法完全一樣。
 
 模式 2 的規則：
 
-- Python 版只做敘述統計與畫圖，數字和 R 版相同（有自動測試比對）。**不可以用 Python（或 scipy、statsmodels）做任何統計檢定或估計**，檢定一律由使用者執行 R 程式碼。
-- 使用者沒貼回輸出之前，只能說明「會看到什麼、怎麼判讀」，不可以自己算數字。
-- 連 Python（pandas、matplotlib）都不能用時，請使用者改在有 R 的環境使用本 Skill。
+- 一律執行 `scripts/` 裡的 Python 程式，**不可以自己另外寫 Python（或用 scipy、statsmodels）計算任何統計量**。
 - 執行環境沒有中文字型時，Python 版的圖會改用英文座標軸標題。
+- Python（pandas、matplotlib、scipy）也不能用時，才把 `references/methods.md` 裡對應方法的 R 程式碼依使用者的欄位名稱改好，交給使用者在 R／RStudio 執行並貼回輸出；貼回之前不可以自己算數字。
 
-需要的 R 套件：`jsonlite readr readxl ggplot2 scales PropCIs`（`Rscript scripts/install_packages.R` 可一次安裝）。Python 版需要 `pandas`、`matplotlib`。
+需要的 R 套件：`jsonlite readr readxl ggplot2 scales PropCIs`（`Rscript scripts/install_packages.R` 可一次安裝）。Python 版需要 `pandas`、`matplotlib`、`scipy`。
 
 ## 流程總覽
 
@@ -163,7 +163,8 @@ Rscript scripts/describe_question.R <資料檔> question.json <輸出資料夾>
 執行：
 
 ```
-Rscript scripts/run_analysis.R <資料檔> spec.json <輸出資料夾>
+Rscript scripts/run_analysis.R <資料檔> spec.json <輸出資料夾>     # 模式 1
+python scripts/run_analysis.py <資料檔> spec.json <輸出資料夾>    # 模式 2
 ```
 
 輸出：`result.json`、圖（`.png`）、`分析報告_<資料>_<方法>.md`（R 自動產生，數字表格都在裡面）、`reproduce.R`、`spec.json` 副本。`result.json` 含 `error` 時，用白話說明並協助修正。JSON 中的 `"Inf"` 代表無限大（例如樣本勝算比 ∞），不是缺失值。
@@ -205,5 +206,5 @@ Rscript scripts/run_analysis.R <資料檔> spec.json <輸出資料夾>
 
 - `references/checklist.md`：注意事項清單，判斷適不適合（階段 3 用）
 - `references/decision-tree.md`：選方法的決策樹（階段 3 用）
-- `references/methods.md`：每個方法的用途、假設、R 程式碼（模式 2 用）
+- `references/methods.md`：每個方法的用途、假設、R 程式碼（沒有 R 也沒有 Python 時，交給使用者自己執行）
 - `references/textbook-methods.md`：教科書的完整步驟與公式（使用者追問原理時用）

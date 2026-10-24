@@ -22,13 +22,6 @@
 .count_name_pattern <- "^(n|count|counts|freq|frequency|weight|wt)$|次數|人數|頻數|數量|個數"
 .age_name_pattern <- "^age$|_age$|^age_|年齡|歲"
 
-# Categories in character-code order (numbers numerically), so the order shown to the
-# user does not depend on the computer's locale and matches the Python version.
-code_order_factor <- function(v) {
-  if (is.factor(v)) return(v)
-  factor(v, levels = sort(unique(v[!is.na(v)]), method = "radix"))
-}
-
 profile_variable <- function(v, name) {
   n <- length(v)
   miss <- sum(is.na(v))

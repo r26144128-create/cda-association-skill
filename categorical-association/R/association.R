@@ -33,7 +33,7 @@
   d <- data[complete, , drop = FALSE]
   wd <- w[complete]
   for (v in vars) {
-    if (!is.factor(d[[v]])) d[[v]] <- factor(d[[v]])
+    d[[v]] <- code_order_factor(d[[v]])
     totals <- tapply(wd, d[[v]], sum)
     empty <- names(totals)[is.na(totals) | totals == 0]
     if (length(empty) > 0) {

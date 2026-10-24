@@ -40,13 +40,14 @@ categorical-association/
 ├── references/
 │   ├── checklist.md             注意事項清單：16 條狀況、MVP 9 條 guardrails（階段 3 判斷用）
 │   ├── decision-tree.md         依變數型態與資料結構選方法
-│   ├── methods.md               各方法速查＋沒有 R 時交給使用者的 R 程式碼
+│   ├── methods.md               各方法速查＋可以自己執行的 R 程式碼
 │   └── textbook-methods.md      教科書的公式、節號、警告代碼
 ├── scripts/
 │   ├── profile_data.R / .py     階段 1：資料總覽、判斷變數型態與資料結構
 │   ├── describe_question.R / .py 階段 2：依問題畫圖、算判斷要用的數字
-│   ├── cda_describe.py          Python 版共用程式（網頁版用）
-│   ├── run_analysis.R           階段 4：計算、畫圖、產生報告
+│   ├── run_analysis.R / .py     階段 4：計算、畫圖、產生報告
+│   ├── cda_describe.py          Python 版：讀資料、總表、畫圖（網頁版用）
+│   ├── cda_engine.py            Python 版的計算引擎（網頁版用，對照 R/association.R 改寫）
 │   ├── load_engine.R            載入計算引擎
 │   └── install_packages.R       安裝需要的 R 套件
 └── R/                           計算引擎（association.R、describe.R、profile.R、plots.R、utils.R）
@@ -69,8 +70,8 @@ categorical-association/
 
 claude.ai 網頁版：在「設定 → 功能」開啟程式碼執行，再到「Skills」上傳 zip。網頁版沒有 R，skill 會改用**模式 2**：
 
-- 第 1–2 步（總表、圖）用 Python 版自動跑（需要 pandas、matplotlib，網頁版實測都有），輸出和 R 版相同。
-- 第 4 步（統計檢定）給你改好欄位名稱的 R 程式碼，你在 RStudio 執行後把輸出貼回去，它再解釋。Python 不做任何統計檢定。
+- 全部步驟都改用 Python 版程式自動執行（需要 pandas、matplotlib、scipy），不需要 R，也不用 RStudio。
+- Python 版是 R 版逐行對照改寫的；自動測試逐項比對兩邊的數字、結論句、警告與報告檔，結果相同。
 
 **不要上傳含個人資料的檔案**（姓名、學號、病歷）。
 
@@ -84,7 +85,7 @@ claude.ai 網頁版：在「設定 → 功能」開啟程式碼執行，再到�
 | `*.png` | 條件比例圖、殘差圖、趨勢圖或分層勝算比圖 |
 | `result.json` | 所有數字（給程式讀） |
 | `spec.json` | 這次的判斷紀錄：問題、變數型態、資料結構、方法與理由 |
-| `reproduce.R` | 自己重跑這次分析的 R 程式碼 |
+| `reproduce.R`（網頁版為 `reproduce.py`） | 自己重跑這次分析的程式碼 |
 
 ## 示範資料
 
@@ -127,7 +128,7 @@ Rscript -e "testthat::test_dir('dev/tests')"
 - `dev/tests/test-association.R`：用教科書的例子（政黨×性別、阿斯匹靈、品茶、飲酒與畸形、死刑判決）檢查每個數字都和課本一致
 - `dev/tests/test-association.R` 也檢查注意事項清單的規則：Cochran 準則、0 cell 與空類別、缺失比例、各層方向不一致、小組人數提醒、兩種趨勢檢定的命名與拒絕條件
 - `dev/tests/test-skill.R`：資料判斷、recode、階段 1–4 的程式端對端、模式 2 的 R 程式碼和引擎結果一致、不支援的分析會拒絕、上面三份示範資料的預期結果（另用 R 內建函式重算）
-- `dev/tests/test-python.R`：Python 版和 R 版在 9 份資料、8 個問題上的總表與檢查數字逐項一致（沒有 Python 時自動略過）
+- `dev/tests/test-python.R`：Python 版和 R 版逐項比對：第 1–2 步的總表與檢查數字（10 份資料、8 個問題），以及第 4 步 15 個分析案例的 `result.json` 與報告檔（沒有 Python 時自動略過）
 
 沒有下載課本資料時，用到這些資料的測試會自動略過。
 
@@ -162,7 +163,7 @@ Rscript -e "testthat::test_dir('dev/tests')"
 
 - R Core Team (2026). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing. <https://www.R-project.org/>
 - R 套件：ggplot2（Wickham, 2016）、jsonlite（Ooms, 2014）、readr、readxl、scales（Wickham et al.）、PropCIs（Scherer）、MASS（Venables & Ripley, 2002）、testthat（Wickham, 2011）、yaml；方法頁另用 epitools（Aragon）計算延伸說明中的 mid-P
-- Python 套件：pandas（The pandas development team）、matplotlib（Hunter, 2007）
+- Python 套件：pandas（The pandas development team）、matplotlib（Hunter, 2007）、NumPy（Harris et al., 2020）、SciPy（Virtanen et al., 2020）
 - Quarto（Allaire et al.）：產生 `methods.html` 與 `make-skill-tutorial.html`
 - 開發過程使用 Claude Code（Anthropic）輔助，紀錄見 `dev/ai-log/log.csv`
 
@@ -170,11 +171,15 @@ Rscript -e "testthat::test_dir('dev/tests')"
 
 Agresti, A. (2019). *An Introduction to Categorical Data Analysis* (3rd ed.). Wiley.
 
+Harris, C. R., Millman, K. J., van der Walt, S. J., et al. (2020). Array programming with NumPy. *Nature*, 585, 357–362.
+
 Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. *Computing in Science & Engineering*, 9(3), 90–95.
 
 Ooms, J. (2014). The jsonlite package: A practical and consistent mapping between JSON data and R objects. arXiv:1403.2805.
 
 Venables, W. N., & Ripley, B. D. (2002). *Modern Applied Statistics with S* (4th ed.). Springer.
+
+Virtanen, P., Gommers, R., Oliphant, T. E., et al. (2020). SciPy 1.0: Fundamental algorithms for scientific computing in Python. *Nature Methods*, 17, 261–272.
 
 Wickham, H. (2011). testthat: Get started with testing. *The R Journal*, 3(1), 5–10.
 
