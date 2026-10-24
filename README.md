@@ -127,7 +127,7 @@ Rscript -e "testthat::test_dir('dev/tests')"
 
 - `dev/tests/test-association.R`：用教科書的例子（政黨×性別、阿斯匹靈、品茶、飲酒與畸形、死刑判決）檢查每個數字都和課本一致
 - `dev/tests/test-association.R` 也檢查注意事項清單的規則：Cochran 準則、0 cell 與空類別、缺失比例、各層方向不一致、小組人數提醒、兩種趨勢檢定的命名與拒絕條件
-- `dev/tests/test-skill.R`：資料判斷、recode、階段 1–4 的程式端對端、模式 2 的 R 程式碼和引擎結果一致、不支援的分析會拒絕、上面三份示範資料的預期結果（另用 R 內建函式重算）
+- `dev/tests/test-skill.R`：資料判斷、recode、階段 1–4 的程式端對端、模式 2 的 R 程式碼和引擎結果一致、不支援的分析會拒絕、上面四份示範資料的預期結果（04 要被偵測為重複觀察）（另用 R 內建函式重算）
 - `dev/tests/test-python.R`：Python 版和 R 版逐項比對：第 1–2 步的總表與檢查數字（10 份資料、8 個問題），以及第 4 步 15 個分析案例的 `result.json` 與報告檔（沒有 Python 時自動略過）
 
 沒有下載課本資料時，用到這些資料的測試會自動略過。
