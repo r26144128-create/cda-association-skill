@@ -1,1 +1,0 @@
-{"question":"住戶對管理的影響力越大，居住滿意度越高嗎？","structure":"independent","types":{"Infl":"ordinal","Sat":"ordinal"},"method_id":"trend","reason":"兩個有序變數，用 linear-by-linear association 檢定（§2.5.1）","analysis":"trend","x":"Infl","y":"Sat","count":"Freq","ordinal":["Infl","Sat"],"design":"cross-sectional","levels":{"Infl":["Low","Medium","High"],"Sat":["Low","Medium","High"]}}

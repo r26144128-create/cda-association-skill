@@ -19,41 +19,6 @@ ul.task-list li input[type="checkbox"] {
 width: 0.8em;
 margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 }
-
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-{ counter-reset: source-line 0; }
-pre.numberSource code > span
-{ position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-{ content: counter(source-line);
-position: relative; left: -1em; text-align: right; vertical-align: baseline;
-border: none; display: inline-block;
--webkit-touch-callout: none; -webkit-user-select: none;
--khtml-user-select: none; -moz-user-select: none;
--ms-user-select: none; user-select: none;
-padding: 0 4px; width: 4em;
-}
-pre.numberSource { margin-left: 3em; padding-left: 4px; }
-div.sourceCode
-{ }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -5244,12 +5209,11 @@ window.Quarto = {
     <h2 id="toc-title">目錄</h2>
    
   <ul>
-  <li><a href="#先看總表skill-會用到的方法" id="toc-先看總表skill-會用到的方法" class="nav-link active" data-scroll-target="#先看總表skill-會用到的方法">先看總表：Skill 會用到的方法</a></li>
-  <li><a href="#比例差相對風險勝算比該報哪一個" id="toc-比例差相對風險勝算比該報哪一個" class="nav-link" data-scroll-target="#比例差相對風險勝算比該報哪一個">比例差、相對風險、勝算比：該報哪一個？</a></li>
-  <li><a href="#有沒有關聯卡方檢定" id="toc-有沒有關聯卡方檢定" class="nav-link" data-scroll-target="#有沒有關聯卡方檢定">有沒有關聯：卡方檢定</a></li>
-  <li><a href="#期望次數太小卡方-vs-fisher" id="toc-期望次數太小卡方-vs-fisher" class="nav-link" data-scroll-target="#期望次數太小卡方-vs-fisher">期望次數太小：卡方 vs Fisher</a></li>
-  <li><a href="#變數有順序卡方-vs-趨勢檢定" id="toc-變數有順序卡方-vs-趨勢檢定" class="nav-link" data-scroll-target="#變數有順序卡方-vs-趨勢檢定">變數有順序：卡方 vs 趨勢檢定</a></li>
-  <li><a href="#有第三個變數合併看-vs-分層看" id="toc-有第三個變數合併看-vs-分層看" class="nav-link" data-scroll-target="#有第三個變數合併看-vs-分層看">有第三個變數：合併看 vs 分層看</a></li>
+  <li><a href="#一張表看懂" id="toc-一張表看懂" class="nav-link active" data-scroll-target="#一張表看懂">一張表看懂</a></li>
+  <li><a href="#兩組差多少比例差相對風險勝算比" id="toc-兩組差多少比例差相對風險勝算比" class="nav-link" data-scroll-target="#兩組差多少比例差相對風險勝算比">1. 兩組差多少：比例差、相對風險、勝算比</a></li>
+  <li><a href="#有沒有關聯卡方-vs-fisher" id="toc-有沒有關聯卡方-vs-fisher" class="nav-link" data-scroll-target="#有沒有關聯卡方-vs-fisher">2. 有沒有關聯：卡方 vs Fisher</a></li>
+  <li><a href="#變數有順序卡方-vs-趨勢檢定" id="toc-變數有順序卡方-vs-趨勢檢定" class="nav-link" data-scroll-target="#變數有順序卡方-vs-趨勢檢定">3. 變數有順序：卡方 vs 趨勢檢定</a></li>
+  <li><a href="#有第三個變數合併看-vs-分層看" id="toc-有第三個變數合併看-vs-分層看" class="nav-link" data-scroll-target="#有第三個變數合併看-vs-分層看">4. 有第三個變數：合併看 vs 分層看</a></li>
   <li><a href="#重點整理" id="toc-重點整理" class="nav-link" data-scroll-target="#重點整理">重點整理</a></li>
   <li><a href="#參考文獻" id="toc-參考文獻" class="nav-link" data-scroll-target="#參考文獻">參考文獻</a></li>
   </ul>
@@ -5260,7 +5224,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">兩個類別變數有沒有關聯？</h1>
-<p class="subtitle lead">方法介紹與比較：categorical-association Skill 用到的方法</p>
+<p class="subtitle lead">方法比較：categorical-association Skill 用到的方法，差在哪裡</p>
 </div>
 
 
@@ -5287,70 +5251,50 @@ window.Quarto = {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>兩個類別變數<strong>有沒有關聯</strong>？關聯<strong>有多強</strong>？<strong>樣本小、變數有順序、有第三個變數</strong>時，要換什麼方法？每個問題都有幾種方法可以選，重點放在<strong>它們的差別</strong>。</p>
+<p>同樣是「兩個類別變數有沒有關聯」，碰到不同情況要用不同的方法。這一頁只講<strong>它們差在哪裡</strong>；例子都是假想資料，公式收在可以展開的框裡。</p>
 </div>
 </div>
-<section id="先看總表skill-會用到的方法" class="level2">
-<h2 class="anchored" data-anchor-id="先看總表skill-會用到的方法">先看總表：Skill 會用到的方法</h2>
+<section id="一張表看懂" class="level2">
+<h2 class="anchored" data-anchor-id="一張表看懂">一張表看懂</h2>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 20%">
-<col style="width: 20%">
-<col style="width: 20%">
-<col style="width: 20%">
-<col style="width: 20%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
 </colgroup>
 <thead>
 <tr class="header">
 <th>你想知道</th>
-<th>方法</th>
-<th>適用資料</th>
-<th>得到什麼</th>
-<th>主要限制</th>
+<th>可以用的方法</th>
+<th>差別在哪</th>
+<th>例子（假想）</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>兩組比例差多少</td>
+<td>兩組差多少？</td>
 <td>比例差、相對風險、勝算比</td>
-<td>2×2 表</td>
-<td>效果大小＋信賴區間</td>
-<td>三者意義不同，case-control 只能用勝算比</td>
+<td>比例差說「差幾個百分點」，相對風險說「機率是幾倍」，勝算比說「<strong>勝算</strong>是幾倍」</td>
+<td>吃宵夜胃不舒服 24% vs 10%：差 14 個百分點、相對風險 2.40、勝算比 2.84</td>
 </tr>
 <tr class="even">
-<td>有沒有關聯</td>
-<td>卡方檢定 X²、G²</td>
-<td>任何 I×J 表</td>
-<td>P 值、標準化殘差</td>
-<td>需要夠大的樣本；忽略順序</td>
+<td>有沒有關聯？</td>
+<td>卡方檢定、Fisher 精確檢定</td>
+<td>卡方靠大樣本近似；樣本太小、期望次數太小時改用 Fisher</td>
+<td>8 杯手搖飲猜甜度：卡方 P = 0.157（不可靠），Fisher P = 0.486</td>
 </tr>
 <tr class="odd">
-<td>期望次數太小</td>
-<td>Fisher 精確檢定</td>
-<td>2×2（或小表）</td>
-<td>精確 P 值</td>
-<td>偏保守</td>
+<td>變數有順序時？</td>
+<td>卡方 vs 趨勢檢定</td>
+<td>卡方忽略順序；趨勢檢定只看「越…越…」，證據集中、通常更有力，還能看出方向</td>
+<td>滑手機越久睡越差嗎：卡方 df = 3，趨勢檢定 df = 1，P 值更小</td>
 </tr>
 <tr class="even">
-<td>變數有順序</td>
-<td>Cochran–Armitage 趨勢檢定</td>
-<td>二元結果 × 有序解釋變數</td>
-<td>1 個自由度的 P 值、趨勢方向</td>
-<td>結果受分數影響；名目變數不能用</td>
-</tr>
-<tr class="odd">
-<td>兩個變數都有順序</td>
-<td>Linear-by-linear association 檢定</td>
-<td>有序 × 有序</td>
-<td>1 個自由度的 P 值、趨勢方向</td>
-<td>同上；性別等二元名目 × 有序不適用</td>
-</tr>
-<tr class="even">
-<td>控制第三個變數</td>
-<td>分層勝算比、CMH 檢定</td>
-<td>2×2×K</td>
-<td>控制後的勝算比、P 值</td>
-<td>Skill 第一版限 X、Y 二元；各層效果不同時不能只報一個數字</td>
+<td>有第三個變數時？</td>
+<td>合併看 vs 分層看（CMH）</td>
+<td>合併的結果可能被第三個變數誤導，甚至方向相反；分層後才是控制後的結果</td>
+<td>補習班：合併看 A 較好，分學生程度後兩群都是 B 較好</td>
 </tr>
 </tbody>
 </table>
@@ -5364,7 +5308,7 @@ window.Quarto = {
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>以上方法都假設<strong>每一列是不同、互不相關的個體</strong>。同一個人測兩次、前後測、夫妻、同班同學，都不符合，要改用配對或相關資料的方法（組員 Part 3 的 Skill）。</p>
+<p>以上方法都假設<strong>每一列是不同、互不相關的個體</strong>。同一個人測兩次、前後測、同一個學生的兩科成績，都不符合，要改用配對資料的方法（組員 Part 3 的 Skill）。</p>
 </div>
 </div>
 <div class="cell" data-layout-align="default">
@@ -5378,8 +5322,8 @@ window.Quarto = {
     B -- 是 --&gt; C{要控制第三個變數？}
     C -- 是 --&gt; S[分層分析＋CMH]
     C -- 否 --&gt; D{有變數有順序？}
-    D -- 是 --&gt; T[Cochran–Armitage 或&lt;br/&gt;linear-by-linear]
-    D -- 否 --&gt; E{期望次數夠大？&lt;br/&gt;Cochran 準則}
+    D -- 是 --&gt; T[趨勢檢定]
+    D -- 否 --&gt; E{期望次數夠大？}
     E -- 是 --&gt; X[卡方檢定]
     E -- 否 --&gt; F[Fisher 精確檢定]
 </pre>
@@ -5389,91 +5333,39 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="比例差相對風險勝算比該報哪一個" class="level2">
-<h2 class="anchored" data-anchor-id="比例差相對風險勝算比該報哪一個">比例差、相對風險、勝算比：該報哪一個？</h2>
-<p>例子：吃宵夜的人，隔天比較容易胃不舒服嗎？問了 400 人（假想資料）。</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>snack <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">48</span>, <span class="dv">152</span>, <span class="dv">20</span>, <span class="dv">180</span>), <span class="at">nrow =</span> <span class="dv">2</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">dimnames =</span> <span class="fu">list</span>(宵夜 <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;有吃&quot;</span>, <span class="st">&quot;沒吃&quot;</span>), 胃不舒服 <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;是&quot;</span>, <span class="st">&quot;否&quot;</span>)))</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>snack</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>      胃不舒服
-宵夜 是  否
-  有吃 48 152
-  沒吃 20 180</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>(snack, <span class="at">margin =</span> <span class="dv">1</span>)   <span class="co"># 各組內的比例</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>      胃不舒服
-宵夜   是   否
-  有吃 0.24 0.76
-  沒吃 0.10 0.90</code></pre>
-</div>
-</div>
-<p>同一張表，三種說法：</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(PropCIs)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">diffscoreci</span>(<span class="dv">48</span>, <span class="dv">200</span>, <span class="dv">20</span>, <span class="dv">200</span>, <span class="at">conf.level =</span> <span class="fl">0.95</span>)   <span class="co"># 比例差</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-
-
-data:  
-
-95 percent confidence interval:
- 0.06764929 0.21366343</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">riskscoreci</span>(<span class="dv">48</span>, <span class="dv">200</span>, <span class="dv">20</span>, <span class="dv">200</span>, <span class="at">conf.level =</span> <span class="fl">0.95</span>)   <span class="co"># 相對風險</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-
-
-data:  
-
-95 percent confidence interval:
- 1.493513 3.889983</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">orscoreci</span>(<span class="dv">48</span>, <span class="dv">200</span>, <span class="dv">20</span>, <span class="dv">200</span>, <span class="at">conf.level =</span> <span class="fl">0.95</span>)     <span class="co"># 勝算比</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-
-
-data:  
-
-95 percent confidence interval:
- 1.621688 4.975983</code></pre>
-</div>
-</div>
+<section id="兩組差多少比例差相對風險勝算比" class="level2">
+<h2 class="anchored" data-anchor-id="兩組差多少比例差相對風險勝算比">1. 兩組差多少：比例差、相對風險、勝算比</h2>
+<p>例子：吃宵夜的人隔天胃不舒服的比例是 24%，沒吃的是 10%（各 200 人）。</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
-<th>量數</th>
+<th>方法</th>
 <th>這個例子</th>
 <th>怎麼說</th>
-<th>無關聯時</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>比例差</td>
-<td>0.24 − 0.10 = 0.14</td>
+<td>0.14</td>
 <td>多了 14 個百分點</td>
-<td>0</td>
 </tr>
 <tr class="even">
 <td>相對風險</td>
-<td>0.24 / 0.10 = 2.4</td>
-<td>比例是 2.4 倍</td>
-<td>1</td>
+<td>2.40</td>
+<td>比例是 2.40 倍</td>
 </tr>
 <tr class="odd">
 <td>勝算比</td>
-<td>(48×180)/(152×20) = 2.84</td>
-<td><strong>勝算</strong>是 2.84 倍</td>
-<td>1</td>
+<td>2.84</td>
+<td><strong>勝算</strong>是 2.84 倍，不是機率 2.84 倍</td>
 </tr>
 </tbody>
 </table>
+<ul>
+<li>勝算比和相對風險只有在比例都很小時才接近。</li>
+<li>case-control 研究（先找病人和對照組，再回頭調查）只能報勝算比。</li>
+</ul>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -5486,78 +5378,91 @@ data:
 </div>
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>兩組的成功比例 <span class="math inline">\(\hat\pi_1, \hat\pi_2\)</span>，2×2 表的次數 <span class="math inline">\(n_{11}, n_{12}, n_{21}, n_{22}\)</span>：</p>
 <p><span class="math display">\[\hat\pi_1 - \hat\pi_2, \qquad \frac{\hat\pi_1}{\hat\pi_2}, \qquad \hat\theta = \frac{\hat\pi_1/(1-\hat\pi_1)}{\hat\pi_2/(1-\hat\pi_2)} = \frac{n_{11}n_{22}}{n_{12}n_{21}}\]</span></p>
-<p>勝算比的信賴區間通常在 log 尺度上算，標準誤 <span class="math inline">\(\sqrt{1/n_{11}+1/n_{12}+1/n_{21}+1/n_{22}}\)</span>；有格子為 0 時無法計算，所以 Skill 用 <strong>score 信賴區間</strong>。</p>
 </div>
 </div>
 </div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
+</section>
+<section id="有沒有關聯卡方-vs-fisher" class="level2">
+<h2 class="anchored" data-anchor-id="有沒有關聯卡方-vs-fisher">2. 有沒有關聯：卡方 vs Fisher</h2>
+<p>例子：朋友說她喝得出手搖飲是不是無糖。8 杯裡（4 杯無糖、4 杯全糖）她猜對 6 杯。</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>方法</th>
+<th>P 值</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>卡方檢定</td>
+<td>0.157</td>
+<td>每格的期望次數只有 2，大樣本近似<strong>可能不可靠</strong></td>
+</tr>
+<tr class="even">
+<td>Fisher 精確檢定</td>
+<td>0.486</td>
+<td>不需要大樣本，這種情況以它為主</td>
+</tr>
+</tbody>
+</table>
+<p>兩個都 &gt; 0.05：8 杯猜對 6 杯，證據還不足以說她喝得出來。</p>
+<ul>
+<li>什麼時候算「期望次數太小」：2×2 表有一格 &lt; 5；更大的表有一格 &lt; 1，或超過 20% 的格子 &lt; 5（Cochran 準則）。重點是表格稀不稀疏，不是總人數。</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">重要</span>比較
+<span class="screen-reader-only">注记</span>公式與延伸：mid-P（點開查看）
 </div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<ul>
-<li><strong>勝算比 ≠ 相對風險</strong>：這裡 2.84 vs 2.4。只有比例都很小（例如罕見疾病）時兩者才接近</li>
-<li><strong>比例差</strong>最直觀，但比例都很小時看不出差別（1% vs 2% 只差 1 個百分點，風險卻是 2 倍）</li>
-<li><strong>case-control 研究</strong>（先找病人和對照組，再回頭調查）只能報勝算比，因為「生病的比例」是研究者決定的</li>
-</ul>
+<p><span class="math display">\[X^2 = \sum_{i,j}\frac{(n_{ij}-\hat\mu_{ij})^2}{\hat\mu_{ij}}, \qquad \hat\mu_{ij} = \frac{n_{i+}n_{+j}}{n}\]</span></p>
+<p>Fisher 精確檢定固定行列總和，用超幾何分配算出「比觀察到的更極端」的機率。因為分配是離散的，小樣本時偏保守。<strong>mid-P</strong> 是一種替代做法，這個例子 mid-P = 0.257。Skill 第一版為了避免同時給好幾種 P 值，只報 Fisher；mid-P 留作之後的延伸。</p>
+</div>
 </div>
 </div>
 </section>
-<section id="有沒有關聯卡方檢定" class="level2">
-<h2 class="anchored" data-anchor-id="有沒有關聯卡方檢定">有沒有關聯：卡方檢定</h2>
-<p>例子：不同年級的學生，最常用的通勤方式一樣嗎？（假想資料）</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>commute <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">30</span>, <span class="dv">45</span>, <span class="dv">25</span>,</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                    <span class="dv">42</span>, <span class="dv">38</span>, <span class="dv">20</span>,</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                    <span class="dv">55</span>, <span class="dv">25</span>, <span class="dv">20</span>), <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">dimnames =</span> <span class="fu">list</span>(年級 <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;大一&quot;</span>, <span class="st">&quot;大二&quot;</span>, <span class="st">&quot;大三&quot;</span>), 通勤 <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;機車&quot;</span>, <span class="st">&quot;公車&quot;</span>, <span class="st">&quot;腳踏車&quot;</span>)))</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>commute</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>      通勤
-年級 機車 公車 腳踏車
-  大一   30   45     25
-  大二   42   38     20
-  大三   55   25     20</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>ct <span class="ot">&lt;-</span> <span class="fu">chisq.test</span>(commute)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ct</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-    Pearson&#39;s Chi-squared test
-
-data:  commute
-X-squared = 13.877, df = 4, p-value = 0.007697</code></pre>
-</div>
-</div>
-<p>P = 0.008：<strong>有證據顯示年級和通勤方式有關</strong>。但卡方只說「有關」，不說<strong>哪裡</strong>不一樣，要看<strong>標準化殘差</strong>：</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(ct<span class="sc">$</span>stdres, <span class="dv">2</span>)</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>      通勤
-年級  機車  公車 腳踏車
-  大一 -3.06  2.30   0.99
-  大二 -0.08  0.51  -0.50
-  大三  3.14 -2.81  -0.50</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img role="img" src="data:image/png;base64,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" class="img-fluid figure-img" width="672"></p>
-<figcaption>紅色：比「無關」時預期的多；藍色：比預期少。絕對值大於 2 值得注意</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<p>大三騎機車的多、搭公車的少。</p>
+<section id="變數有順序卡方-vs-趨勢檢定" class="level2">
+<h2 class="anchored" data-anchor-id="變數有順序卡方-vs-趨勢檢定">3. 變數有順序：卡方 vs 趨勢檢定</h2>
+<p>例子：每天滑手機的時間（&lt;1、1–3、3–5、&gt;5 小時）越長，睡眠品質越差嗎？</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>方法</th>
+<th>結果</th>
+<th>差別</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>卡方檢定</td>
+<td>X² = 17.35（df = 3）</td>
+<td>把四個時段當成沒有順序，只說「有關」</td>
+</tr>
+<tr class="even">
+<td>趨勢檢定</td>
+<td>M² = 17.27（df = 1）</td>
+<td>只檢定「越久越差」，證據集中在 1 個自由度，P 值更小，還告訴你方向</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>結果是二元、解釋變數有順序（像這個例子）叫 <strong>Cochran–Armitage 趨勢檢定</strong>；兩個都有順序叫 <strong>linear-by-linear association 檢定</strong>。</li>
+<li>每個類別要給一個分數（這裡用各時段中點），類別間距不相等時，分數會影響結果。</li>
+<li>名目變數（例如通勤方式）沒有順序，<strong>不能</strong>做趨勢檢定；數字代碼 1、2、3、4 也不代表有順序。</li>
+</ul>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -5570,294 +5475,14 @@ X-squared = 13.877, df = 4, p-value = 0.007697</code></pre>
 </div>
 <div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p><span class="math inline">\(H_0\)</span>：兩個變數獨立。期望次數 <span class="math inline">\(\hat\mu_{ij} = n_{i+}n_{+j}/n\)</span>：</p>
-<p><span class="math display">\[X^2 = \sum_{i,j}\frac{(n_{ij}-\hat\mu_{ij})^2}{\hat\mu_{ij}}, \qquad G^2 = 2\sum_{i,j} n_{ij}\log\frac{n_{ij}}{\hat\mu_{ij}}, \qquad df = (I-1)(J-1)\]</span></p>
-<p>標準化殘差 <span class="math inline">\(\dfrac{n_{ij}-\hat\mu_{ij}}{\sqrt{\hat\mu_{ij}(1-\hat\pi_{i+})(1-\hat\pi_{+j})}}\)</span></p>
-</div>
-</div>
-</div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">重要</span>X² 和 G² 的比較
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>兩者都比較「實際」和「無關時預期」的次數，大樣本時結果幾乎一樣（這裡 X² = 13.88，G² = 14.18）。樣本小時兩者都不可靠，而不是哪一個比較好，此時改用精確檢定。</p>
-</div>
-</div>
-</section>
-<section id="期望次數太小卡方-vs-fisher" class="level2">
-<h2 class="anchored" data-anchor-id="期望次數太小卡方-vs-fisher">期望次數太小：卡方 vs Fisher</h2>
-<p>例子：朋友說她喝得出手搖飲是不是無糖。準備 8 杯（4 杯無糖、4 杯全糖），她猜對 6 杯。（假想資料，仿照 Fisher 的品茶實驗）</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>drink <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">3</span>), <span class="at">nrow =</span> <span class="dv">2</span>,</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">dimnames =</span> <span class="fu">list</span>(實際 <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;無糖&quot;</span>, <span class="st">&quot;全糖&quot;</span>), 她猜 <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;無糖&quot;</span>, <span class="st">&quot;全糖&quot;</span>)))</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>drink</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>      她猜
-實際 無糖 全糖
-  無糖    3    1
-  全糖    1    3</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chisq.test</span>(drink, <span class="at">correct =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>expected   <span class="co"># 每格只有 2</span></span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>      她猜
-實際 無糖 全糖
-  無糖    2    2
-  全糖    2    2</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(卡方 <span class="ot">=</span> <span class="fu">chisq.test</span>(drink, <span class="at">correct =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>p.value,</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Fisher =</span> <span class="fu">fisher.test</span>(drink)<span class="sc">$</span>p.value)</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>     卡方    Fisher 
-0.1572992 0.4857143 </code></pre>
-</div>
-</div>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>方法</th>
-<th>P 值</th>
-<th>說明</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>卡方</td>
-<td>0.157</td>
-<td>期望次數太小，大樣本近似<strong>可能不可靠</strong></td>
-</tr>
-<tr class="even">
-<td>Fisher 精確檢定</td>
-<td>0.486</td>
-<td>不用大樣本近似，Skill 在這種情況以它為主</td>
-</tr>
-</tbody>
-</table>
-<p>兩種都 &gt; 0.05：<strong>8 杯猜對 6 杯，證據還不足以說她喝得出來</strong>。</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">注记</span>什麼時候算「期望次數太小」？
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Skill 用常見的 Cochran 準則：2×2 表只要有一格期望次數 &lt; 5；更大的表有任何一格 &lt; 1，或超過 20% 的格子 &lt; 5。這是實務上的提醒標準，不是「一定不能做卡方」。真正的重點是表格稀不稀疏，而不是總樣本數。</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">注记</span>公式（點開查看）
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-8" class="callout-8-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>固定列總和與欄總和後，<span class="math inline">\(n_{11}\)</span> 服從超幾何分配：</p>
-<p><span class="math display">\[P(n_{11}) = \frac{\binom{n_{1+}}{n_{11}}\binom{n_{2+}}{n_{+1}-n_{11}}}{\binom{n}{n_{+1}}}\]</span></p>
-<p>這裡 <span class="math inline">\(P(0),\dots,P(4) = 0.014, 0.229, 0.514, 0.229, 0.014\)</span>。雙尾 P 值 ＝ 機率不大於觀察表的總和 <span class="math inline">\(= 0.014+0.229+0.229+0.014 = 0.486\)</span>。</p>
-</div>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">注记</span>延伸：mid-P（Skill 第一版不使用，點開查看）
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-9" class="callout-9-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<ul>
-<li>因為超幾何分配是離散的，Fisher 精確檢定在小樣本下<strong>偏保守</strong>：實際犯型一錯誤的機率比設定的 α 小。</li>
-<li><strong>mid-P</strong> 是一種替代做法：把「等於觀察值」那一項的機率只算一半。這個例子的 mid-P = 0.257，比 Fisher 的 0.486 小。</li>
-<li>Skill 第一版為了避免同時給好幾種 P 值讓使用者混淆，<strong>正式輸出只保留 Fisher 精確檢定的 P 值</strong>。</li>
-<li>mid-P 只作為補充知識，留給之後的延伸版本。</li>
-</ul>
-</div>
-</div>
-</div>
-</section>
-<section id="變數有順序卡方-vs-趨勢檢定" class="level2">
-<h2 class="anchored" data-anchor-id="變數有順序卡方-vs-趨勢檢定">變數有順序：卡方 vs 趨勢檢定</h2>
-<p>例子：每天滑手機的時間越長，睡眠品質越差嗎？（假想資料）</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>phone <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">40</span>, <span class="dv">20</span>,</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                  <span class="dv">45</span>, <span class="dv">35</span>,</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                  <span class="dv">30</span>, <span class="dv">40</span>,</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                  <span class="dv">15</span>, <span class="dv">35</span>), <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">dimnames =</span> <span class="fu">list</span>(滑手機 <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;&lt;1小時&quot;</span>, <span class="st">&quot;1-3小時&quot;</span>, <span class="st">&quot;3-5小時&quot;</span>, <span class="st">&quot;&gt;5小時&quot;</span>), 睡眠 <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;好&quot;</span>, <span class="st">&quot;差&quot;</span>)))</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>phone</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>         睡眠
-滑手機 好 差
-  &lt;1小時  40 20
-  1-3小時 45 35
-  3-5小時 30 40
-  &gt;5小時  15 35</code></pre>
-</div>
-</div>
-<p><strong>方法一：卡方檢定</strong>（把四個時段當成沒有順序）</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chisq.test</span>(phone)</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-    Pearson&#39;s Chi-squared test
-
-data:  phone
-X-squared = 17.345, df = 3, p-value = 0.0006001</code></pre>
-</div>
-</div>
-<p><strong>方法二：Cochran–Armitage 趨勢檢定</strong>（睡眠是二元結果、滑手機時間有順序；給每個時段一個分數，只檢定「越多越…」）</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>x_score <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>)                     <span class="co"># 各時段的中點</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">as.table</span>(phone))</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>u <span class="ot">&lt;-</span> <span class="fu">rep</span>(x_score[<span class="fu">as.integer</span>(d<span class="sc">$</span>滑手機)], d<span class="sc">$</span>Freq)</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">ifelse</span>(d<span class="sc">$</span>睡眠 <span class="sc">==</span> <span class="st">&quot;差&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>), d<span class="sc">$</span>Freq)</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>M2 <span class="ot">&lt;-</span> (<span class="fu">length</span>(u) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="fu">cor</span>(u, v)<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">M2 =</span> M2, <span class="at">p =</span> <span class="fu">pchisq</span>(M2, <span class="at">df =</span> <span class="dv">1</span>, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>))</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>          M2            p 
-1.727348e+01 3.236728e-05 </code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 換一組分數（等距 1, 2, 3, 4）看結論會不會變</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>M2_eq <span class="ot">&lt;-</span> (<span class="fu">length</span>(u) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="fu">cor</span>(<span class="fu">match</span>(u, x_score), v)<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(M2_等距 <span class="ot">=</span> M2_eq, <span class="at">p =</span> <span class="fu">pchisq</span>(M2_eq, <span class="at">df =</span> <span class="dv">1</span>, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>))</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>     M2_等距            p 
-1.721981e+01 3.329464e-05 </code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img role="img" src="data:image/png;base64,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" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>卡方 X² = 17.35（df = 3），M² = 17.27（df = 1）：卡方的差異<strong>幾乎全部來自線性趨勢</strong>，M² 的 P 值小了一個數量級以上。換成等距分數 M² = 17.22，結論不變。</p>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">重要</span>比較
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ul>
-<li>卡方的自由度是 3，M² 只有 1：<strong>真的有趨勢時，M² 把證據集中起來，P 值通常更小</strong></li>
-<li>M² 還告訴你<strong>方向</strong>（越滑越差），卡方只說「有關」</li>
-<li>代價：結果受<strong>分數</strong>影響。類別間距不相等時用中點，並換一組分數（例如 1、2、3、4）看結論會不會變。Skill 會自動做這個比較</li>
-<li>名目變數（例如通勤方式）沒有順序，<strong>不能</strong>做趨勢檢定</li>
-</ul>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">注记</span>兩種趨勢檢定，名稱不要混用
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>資料</th>
-<th>方法</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>結果是二元、解釋變數有順序（這個例子）</td>
-<td>Cochran–Armitage 趨勢檢定</td>
-</tr>
-<tr class="even">
-<td>兩個變數都有順序（例如滑手機時間 × 睡眠品質 好／普通／差）</td>
-<td>Linear-by-linear association 檢定</td>
-</tr>
-<tr class="odd">
-<td>解釋變數是性別、組別等二元名目，結果有順序</td>
-<td>Skill 第一版不做趨勢檢定，要先確認分析目的</td>
-</tr>
-</tbody>
-</table>
-<p>兩者的統計量算法相同（都是 <span class="math inline">\(M^2\)</span>），差別在資料型態。類別的順序一定要由使用者確認，數字代碼 1、2、3、4 不代表有順序。</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">注记</span>公式（點開查看）
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-12" class="callout-12-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>X 的分數 <span class="math inline">\(u_1 \le \dots \le u_I\)</span>、Y 的分數 <span class="math inline">\(v_1 \le \dots \le v_J\)</span>，以分數算樣本相關係數 <span class="math inline">\(r\)</span>：</p>
-<p><span class="math display">\[M^2 = (n-1)r^2 \sim \chi^2_1 \quad (H_0: \text{獨立})\]</span></p>
-<p>Y 是二元、X 有序時稱為 Cochran–Armitage 趨勢檢定；X、Y 都有序時稱為 linear-by-linear association 檢定。</p>
+<p>以類別分數算出樣本相關係數 <span class="math inline">\(r\)</span>：<span class="math inline">\(M^2 = (n-1)r^2 \sim \chi^2_1\)</span>。</p>
 </div>
 </div>
 </div>
 </section>
 <section id="有第三個變數合併看-vs-分層看" class="level2">
-<h2 class="anchored" data-anchor-id="有第三個變數合併看-vs-分層看">有第三個變數：合併看 vs 分層看</h2>
-<p>例子：A、B 兩家補習班的考上率。只看合併的結果，A 比較好；但分「基礎好」「基礎差」兩群學生看呢？（假想資料）</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>cram <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="dv">468</span>, <span class="dv">162</span>, <span class="dv">72</span>, <span class="dv">12</span>,      <span class="co"># 基礎好：A 考上、B 考上、A 沒考上、B 沒考上</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>                <span class="dv">110</span>, <span class="dv">384</span>, <span class="dv">50</span>, <span class="dv">142</span>),    <span class="co"># 基礎差</span></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">dim =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>),</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">dimnames =</span> <span class="fu">list</span>(補習班 <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>), 結果 <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;考上&quot;</span>, <span class="st">&quot;沒考上&quot;</span>), 學生 <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;基礎好&quot;</span>, <span class="st">&quot;基礎差&quot;</span>)))</span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ftable</span>(cram, <span class="at">row.vars =</span> <span class="fu">c</span>(<span class="st">&quot;學生&quot;</span>, <span class="st">&quot;補習班&quot;</span>))</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>              結果 考上 沒考上
-學生   補習班                 
-基礎好 A            468     72
-       B            162     12
-基礎差 A            110     50
-       B            384    142</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>odds_ratio <span class="ot">&lt;-</span> <span class="cf">function</span>(t) (t[<span class="dv">1</span>, <span class="dv">1</span>] <span class="sc">*</span> t[<span class="dv">2</span>, <span class="dv">2</span>]) <span class="sc">/</span> (t[<span class="dv">1</span>, <span class="dv">2</span>] <span class="sc">*</span> t[<span class="dv">2</span>, <span class="dv">1</span>])</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(合併 <span class="ot">=</span> <span class="fu">odds_ratio</span>(<span class="fu">margin.table</span>(cram, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))),</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  基礎好 <span class="ot">=</span> <span class="fu">odds_ratio</span>(cram[, , <span class="dv">1</span>]),</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  基礎差 <span class="ot">=</span> <span class="fu">odds_ratio</span>(cram[, , <span class="dv">2</span>]))</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>     合併    基礎好    基礎差 
-1.3362757 0.4814815 0.8135417 </code></pre>
-</div>
-</div>
+<h2 class="anchored" data-anchor-id="有第三個變數合併看-vs-分層看">4. 有第三個變數：合併看 vs 分層看</h2>
+<p>例子：A、B 兩家補習班的考上率。合併來看 A 比較好，但分成「基礎好」「基礎差」兩群學生呢？</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -5867,39 +5492,36 @@ X-squared = 17.345, df = 3, p-value = 0.0006001</code></pre>
 </div>
 </div>
 </div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">重要</span>Simpson 悖論
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>合併看 A 較好（勝算比 &gt; 1），但<strong>每一群學生裡 B 都比較好</strong>（勝算比 &lt; 1）。原因：A 收的多是基礎好的學生，而基礎好的人本來就容易考上。<strong>要以控制後（分層）的結果為準。</strong></p>
-</div>
-</div>
-<p>控制「學生基礎」之後，補習班和考上還有沒有關係？用 <strong>CMH 檢定</strong>。分層之前要先想清楚：學生基礎是<strong>同時影響</strong>選補習班和考上的變數（干擾變數），所以應該控制；如果是補習班造成的結果（中介變數），就不應該控制。</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mantelhaen.test</span>(cram, <span class="at">correct =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="复制到剪贴板" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-    Mantel-Haenszel chi-squared test without continuity correction
-
-data:  cram
-Mantel-Haenszel X-squared = 4.8747, df = 1, p-value = 0.02725
-alternative hypothesis: true common odds ratio is not equal to 1
-95 percent confidence interval:
- 0.5001824 0.9550510
-sample estimates:
-common odds ratio 
-        0.6911583 </code></pre>
-</div>
-</div>
-<p>P = 0.027：控制學生基礎後，<strong>B 補習班的考上勝算比較高</strong>，共同勝算比 0.69（A 相對於 B）。</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>看法</th>
+<th>勝算比（A 相對於 B）</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>合併看</td>
+<td>1.34（A 較好）</td>
+</tr>
+<tr class="even">
+<td>基礎好的學生</td>
+<td>0.48（B 較好）</td>
+</tr>
+<tr class="odd">
+<td>基礎差的學生</td>
+<td>0.81（B 較好）</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>這就是 <strong>Simpson 悖論</strong>：A 收的多是基礎好的學生，而基礎好的人本來就容易考上。</li>
+<li>控制學生程度後用 <strong>CMH 檢定</strong>：P = 0.027，共同勝算比 0.69，B 的考上勝算較高。</li>
+<li>分層前要先想清楚：學生程度同時影響選補習班和考上，是<strong>干擾變數</strong>，應該控制；如果是補習班造成的結果（中介變數），就不該控制。</li>
+<li>各層方向不一致時，不能只報一個共同勝算比，要逐層報告。</li>
+</ul>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-14-contents" aria-controls="callout-14" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -5908,44 +5530,12 @@ common odds ratio
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-14" class="callout-14-contents callout-collapse collapse">
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>第 <span class="math inline">\(k\)</span> 層的<strong>條件勝算比</strong> <span class="math inline">\(\hat\theta_{XY(k)} = n_{11k}n_{22k}/(n_{12k}n_{21k})\)</span>；忽略 Z 合併後算的是<strong>邊際勝算比</strong>。</p>
-<p>CMH 檢定 <span class="math inline">\(H_0\)</span>：每一層 <span class="math inline">\(\theta_{XY(k)} = 1\)</span>（控制 Z 後無關）。它等於 logistic 模型 <span class="math inline">\(\text{logit}[P(Y=1)] = \alpha + \beta x + \beta_k^Z\)</span> 中 <span class="math inline">\(H_0:\beta = 0\)</span> 的 score 檢定，<span class="math inline">\(e^\beta\)</span> 是各層共同的勝算比（這是組員 Part 2 的模型）。</p>
+<p>第 <span class="math inline">\(k\)</span> 層的條件勝算比 <span class="math inline">\(\hat\theta_{XY(k)} = n_{11k}n_{22k}/(n_{12k}n_{21k})\)</span>。CMH 檢定的虛無假設是每一層 <span class="math inline">\(\theta_{XY(k)} = 1\)</span>（控制第三個變數後沒有關聯）。</p>
 </div>
 </div>
 </div>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>看法</th>
-<th>回答的問題</th>
-<th>什麼時候會誤導</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>合併（邊際）勝算比</td>
-<td>不管 Z，整體來看</td>
-<td>Z 同時和 X、Y 有關時（Simpson 悖論）</td>
-</tr>
-<tr class="even">
-<td>分層（條件）勝算比</td>
-<td>Z 固定時</td>
-<td>層數多、每層樣本小時不穩</td>
-</tr>
-<tr class="odd">
-<td>共同勝算比＋CMH</td>
-<td>控制 Z 後的整體效果</td>
-<td>各層方向相反或差很多時：要逐層報告。同質性檢定只是輔助，P &gt; 0.05 不代表一定適合</td>
-</tr>
-</tbody>
-</table>
 </section>
 <section id="重點整理" class="level2">
 <h2 class="anchored" data-anchor-id="重點整理">重點整理</h2>
@@ -5961,10 +5551,10 @@ common odds ratio
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li><strong>先問獨立</strong>：同一人多筆、配對 → 不用這頁的方法</li>
-<li><strong>再問順序</strong>（要經確認）：二元結果 × 有序 → Cochran–Armitage；有序 × 有序 → linear-by-linear，都比卡方有力</li>
-<li><strong>看期望次數</strong>：太小（Cochran 準則）→ Fisher</li>
-<li><strong>想控制別的變數</strong>：先確認它是干擾變數 → 分層＋CMH，逐層看勝算比，留意 Simpson 悖論</li>
-<li><strong>報效果大小</strong>：P 值只說有沒有證據，勝算比、比例差才說多強</li>
+<li><strong>再問順序</strong>：有順序 → 趨勢檢定比卡方有力</li>
+<li><strong>看期望次數</strong>：太小 → Fisher</li>
+<li><strong>想控制別的變數</strong>：先確認是干擾變數 → 分層＋CMH，留意 Simpson 悖論</li>
+<li><strong>報關聯大小</strong>：P 值只說有沒有證據，比例差、相對風險、勝算比才說多大</li>
 </ol>
 </div>
 </div>

@@ -1,0 +1,93 @@
+{
+  "n_rows": 716,
+  "n_cols": 5,
+  "variables": [
+    {
+      "name": "student_id",
+      "n": 716,
+      "n_missing": 0,
+      "n_unique": 358,
+      "type_guess": "id",
+      "needs_confirmation": false,
+      "reason": "欄名像識別碼，且類別很多",
+      "levels": null,
+      "examples": ["S001", "S002", "S003", "S004", "S005"],
+      "range": null
+    },
+    {
+      "name": "course",
+      "n": 716,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "math": 358,
+        "portuguese": 358
+      },
+      "examples": ["math", "portuguese"],
+      "range": null
+    },
+    {
+      "name": "school",
+      "n": 716,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "GP": 640,
+        "MS": 76
+      },
+      "examples": ["GP", "MS"],
+      "range": null
+    },
+    {
+      "name": "sex",
+      "n": 716,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "F": 384,
+        "M": 332
+      },
+      "examples": ["F", "M"],
+      "range": null
+    },
+    {
+      "name": "pass",
+      "n": 716,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "fail": 141,
+        "pass": 575
+      },
+      "examples": ["fail", "pass"],
+      "range": null
+    }
+  ],
+  "structure": {
+    "n_rows": 716,
+    "hints": [
+      {
+        "type": "repeated_measures",
+        "columns": ["student_id", "course"],
+        "evidence": "student_id 有 358 個不同的值，每個值出現 2–2 列（中位數 2）；course 在每個 student_id 內不重複，像是測量時點或題目",
+        "question": "同一個 student_id 是否被測量了多次（每次一列）？",
+        "book_ref": "§9.1, §10.1"
+      }
+    ],
+    "default": "needs_confirmation",
+    "note": "資料本身無法證明觀察值彼此獨立。第 1–7 章的方法都假設獨立（§1.1.3），請使用者確認每一列是否為不同的獨立個體。"
+  },
+  "file": "C:/Users/Administrator/Desktop/categorical analysis/cda-association-skill/example_data/04_paired_student_courses.csv"
+}

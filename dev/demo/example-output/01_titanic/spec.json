@@ -1,0 +1,1 @@
+{"question":"鐵達尼號上女性的存活率比男性高嗎？","structure":"independent","types":{"Sex":"binary","Survived":"binary"},"method_id":"crosstab","reason":"兩個二元變數、每一列是不同的乘客，用列聯表與卡方檢定","analysis":"crosstab","x":"Sex","y":"Survived","success":"Yes","design":"cross-sectional","levels":{"Sex":["Female","Male"],"Survived":["Yes","No"]}}

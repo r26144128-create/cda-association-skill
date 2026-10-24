@@ -1,15 +1,15 @@
 ---
 title: "兩個類別變數有沒有關聯？"
-subtitle: "方法介紹與比較：categorical-association Skill 用到的方法"
+subtitle: "方法比較：categorical-association Skill 用到的方法，差在哪裡"
 lang: zh-Hant
 format:
   html:
     toc: true
     toc-title: 目錄
     embed-resources: true
-    code-fold: false
     theme: cosmo
 execute:
+  echo: false
   warning: false
   message: false
 ---
@@ -19,27 +19,54 @@ execute:
 for (f in list.files("categorical-association/R", pattern = "\\.R$", full.names = TRUE)) source(f)
 library(ggplot2)
 theme_set(theme_minimal(base_size = 12, base_family = "sans"))
+f2 <- function(x) formatC(x, format = "f", digits = 2)
+f3 <- function(x) formatC(x, format = "f", digits = 3)
+
+# Hypothetical examples (all numbers below are made up to show the differences).
+# 1. Late-night snack and upset stomach, 200 people each
+snack <- matrix(c(48, 152, 20, 180), nrow = 2, byrow = TRUE)
+p1 <- 48 / 200; p2 <- 20 / 200
+snack_or <- (48 * 180) / (152 * 20)
+# 2. Eight cups: can a friend taste which drinks are sugar-free?
+drink <- matrix(c(3, 1, 1, 3), nrow = 2)
+drink_chi <- chisq.test(drink, correct = FALSE)$p.value
+drink_fisher <- fisher.test(drink)$p.value
+drink_midp <- epitools::ormidp.test(3, 1, 1, 3)$two.sided
+# 3. Daily phone time and sleep quality
+phone <- matrix(c(40, 20, 45, 35, 30, 40, 15, 35), ncol = 2, byrow = TRUE,
+                dimnames = list(滑手機 = c("<1小時", "1-3小時", "3-5小時", ">5小時"), 睡眠 = c("好", "差")))
+phone_chi <- chisq.test(phone)
+pd <- as.data.frame(as.table(phone))
+pd$滑手機 <- factor(pd$滑手機, levels = rownames(phone), ordered = TRUE)
+phone_trend <- cda_trend(pd, "滑手機", "睡眠", count = "Freq", ordinal = "滑手機",
+                         x_scores = c(0.5, 2, 4, 6), success = "差")
+phone_m2 <- phone_trend$tests[1, ]
+# 4. Two cram schools, students with strong or weak foundations
+cram <- array(c(468, 162, 72, 12, 110, 384, 50, 142), dim = c(2, 2, 2),
+              dimnames = list(補習班 = c("A", "B"), 結果 = c("考上", "沒考上"), 學生 = c("基礎好", "基礎差")))
+odds_ratio <- function(t) (t[1, 1] * t[2, 2]) / (t[1, 2] * t[2, 1])
+cram_marg <- odds_ratio(margin.table(cram, c(1, 2)))
+cram_good <- odds_ratio(cram[, , 1]); cram_weak <- odds_ratio(cram[, , 2])
+cram_cmh <- mantelhaen.test(cram, correct = FALSE)
 ```
 
 ::: {.callout-tip}
 ## 這一頁要回答
-兩個類別變數**有沒有關聯**？關聯**有多強**？**樣本小、變數有順序、有第三個變數**時，要換什麼方法？每個問題都有幾種方法可以選，重點放在**它們的差別**。
+同樣是「兩個類別變數有沒有關聯」，碰到不同情況要用不同的方法。這一頁只講**它們差在哪裡**；例子都是假想資料，公式收在可以展開的框裡。
 :::
 
-## 先看總表：Skill 會用到的方法
+## 一張表看懂
 
-| 你想知道 | 方法 | 適用資料 | 得到什麼 | 主要限制 |
-|---|---|---|---|---|
-| 兩組比例差多少 | 比例差、相對風險、勝算比 | 2×2 表 | 效果大小＋信賴區間 | 三者意義不同，case-control 只能用勝算比 |
-| 有沒有關聯 | 卡方檢定 X²、G² | 任何 I×J 表 | P 值、標準化殘差 | 需要夠大的樣本；忽略順序 |
-| 期望次數太小 | Fisher 精確檢定 | 2×2（或小表） | 精確 P 值 | 偏保守 |
-| 變數有順序 | Cochran–Armitage 趨勢檢定 | 二元結果 × 有序解釋變數 | 1 個自由度的 P 值、趨勢方向 | 結果受分數影響；名目變數不能用 |
-| 兩個變數都有順序 | Linear-by-linear association 檢定 | 有序 × 有序 | 1 個自由度的 P 值、趨勢方向 | 同上；性別等二元名目 × 有序不適用 |
-| 控制第三個變數 | 分層勝算比、CMH 檢定 | 2×2×K | 控制後的勝算比、P 值 | Skill 第一版限 X、Y 二元；各層效果不同時不能只報一個數字 |
+| 你想知道 | 可以用的方法 | 差別在哪 | 例子（假想） |
+|---|---|---|---|
+| 兩組差多少？ | 比例差、相對風險、勝算比 | 比例差說「差幾個百分點」，相對風險說「機率是幾倍」，勝算比說「**勝算**是幾倍」 | 吃宵夜胃不舒服 `r round(p1 * 100)`% vs `r round(p2 * 100)`%：差 `r round((p1 - p2) * 100)` 個百分點、相對風險 `r f2(p1 / p2)`、勝算比 `r f2(snack_or)` |
+| 有沒有關聯？ | 卡方檢定、Fisher 精確檢定 | 卡方靠大樣本近似；樣本太小、期望次數太小時改用 Fisher | 8 杯手搖飲猜甜度：卡方 P = `r f3(drink_chi)`（不可靠），Fisher P = `r f3(drink_fisher)` |
+| 變數有順序時？ | 卡方 vs 趨勢檢定 | 卡方忽略順序；趨勢檢定只看「越…越…」，證據集中、通常更有力，還能看出方向 | 滑手機越久睡越差嗎：卡方 df = 3，趨勢檢定 df = 1，P 值更小 |
+| 有第三個變數時？ | 合併看 vs 分層看（CMH） | 合併的結果可能被第三個變數誤導，甚至方向相反；分層後才是控制後的結果 | 補習班：合併看 A 較好，分學生程度後兩群都是 B 較好 |
 
 ::: {.callout-warning}
 ## 共同前提：每一筆資料彼此獨立
-以上方法都假設**每一列是不同、互不相關的個體**。同一個人測兩次、前後測、夫妻、同班同學，都不符合，要改用配對或相關資料的方法（組員 Part 3 的 Skill）。
+以上方法都假設**每一列是不同、互不相關的個體**。同一個人測兩次、前後測、同一個學生的兩科成績，都不符合，要改用配對資料的方法（組員 Part 3 的 Skill）。
 :::
 
 ```{mermaid}
@@ -49,280 +76,103 @@ flowchart LR
     B -- 是 --> C{要控制第三個變數？}
     C -- 是 --> S[分層分析＋CMH]
     C -- 否 --> D{有變數有順序？}
-    D -- 是 --> T[Cochran–Armitage 或<br/>linear-by-linear]
-    D -- 否 --> E{期望次數夠大？<br/>Cochran 準則}
+    D -- 是 --> T[趨勢檢定]
+    D -- 否 --> E{期望次數夠大？}
     E -- 是 --> X[卡方檢定]
     E -- 否 --> F[Fisher 精確檢定]
 ```
 
-## 比例差、相對風險、勝算比：該報哪一個？
+## 1. 兩組差多少：比例差、相對風險、勝算比
 
-例子：吃宵夜的人，隔天比較容易胃不舒服嗎？問了 400 人（假想資料）。
+例子：吃宵夜的人隔天胃不舒服的比例是 `r round(p1 * 100)`%，沒吃的是 `r round(p2 * 100)`%（各 200 人）。
 
-```{r}
-snack <- matrix(c(48, 152, 20, 180), nrow = 2, byrow = TRUE,
-                dimnames = list(宵夜 = c("有吃", "沒吃"), 胃不舒服 = c("是", "否")))
-snack
-prop.table(snack, margin = 1)   # 各組內的比例
-```
+| 方法 | 這個例子 | 怎麼說 |
+|---|---|---|
+| 比例差 | `r f2(p1 - p2)` | 多了 `r round((p1 - p2) * 100)` 個百分點 |
+| 相對風險 | `r f2(p1 / p2)` | 比例是 `r f2(p1 / p2)` 倍 |
+| 勝算比 | `r f2(snack_or)` | **勝算**是 `r f2(snack_or)` 倍，不是機率 `r f2(snack_or)` 倍 |
 
-同一張表，三種說法：
-
-```{r}
-library(PropCIs)
-diffscoreci(48, 200, 20, 200, conf.level = 0.95)   # 比例差
-riskscoreci(48, 200, 20, 200, conf.level = 0.95)   # 相對風險
-orscoreci(48, 200, 20, 200, conf.level = 0.95)     # 勝算比
-```
-
-| 量數 | 這個例子 | 怎麼說 | 無關聯時 |
-|---|---|---|---|
-| 比例差 | 0.24 − 0.10 = 0.14 | 多了 14 個百分點 | 0 |
-| 相對風險 | 0.24 / 0.10 = 2.4 | 比例是 2.4 倍 | 1 |
-| 勝算比 | (48×180)/(152×20) = 2.84 | **勝算**是 2.84 倍 | 1 |
+- 勝算比和相對風險只有在比例都很小時才接近。
+- case-control 研究（先找病人和對照組，再回頭調查）只能報勝算比。
 
 ::: {.callout-note collapse="true"}
 ## 公式（點開查看）
-兩組的成功比例 $\hat\pi_1, \hat\pi_2$，2×2 表的次數 $n_{11}, n_{12}, n_{21}, n_{22}$：
-
 $$\hat\pi_1 - \hat\pi_2, \qquad \frac{\hat\pi_1}{\hat\pi_2}, \qquad \hat\theta = \frac{\hat\pi_1/(1-\hat\pi_1)}{\hat\pi_2/(1-\hat\pi_2)} = \frac{n_{11}n_{22}}{n_{12}n_{21}}$$
-
-勝算比的信賴區間通常在 log 尺度上算，標準誤 $\sqrt{1/n_{11}+1/n_{12}+1/n_{21}+1/n_{22}}$；有格子為 0 時無法計算，所以 Skill 用 **score 信賴區間**。
 :::
 
-::: {.callout-important}
-## 比較
-- **勝算比 ≠ 相對風險**：這裡 2.84 vs 2.4。只有比例都很小（例如罕見疾病）時兩者才接近
-- **比例差**最直觀，但比例都很小時看不出差別（1% vs 2% 只差 1 個百分點，風險卻是 2 倍）
-- **case-control 研究**（先找病人和對照組，再回頭調查）只能報勝算比，因為「生病的比例」是研究者決定的
-:::
+## 2. 有沒有關聯：卡方 vs Fisher
 
-## 有沒有關聯：卡方檢定
-
-例子：不同年級的學生，最常用的通勤方式一樣嗎？（假想資料）
-
-```{r}
-commute <- matrix(c(30, 45, 25,
-                    42, 38, 20,
-                    55, 25, 20), nrow = 3, byrow = TRUE,
-                  dimnames = list(年級 = c("大一", "大二", "大三"), 通勤 = c("機車", "公車", "腳踏車")))
-commute
-ct <- chisq.test(commute)
-ct
-```
-
-P = `r format(round(ct$p.value, 3), nsmall = 3)`：**有證據顯示年級和通勤方式有關**。但卡方只說「有關」，不說**哪裡**不一樣，要看**標準化殘差**：
-
-```{r}
-round(ct$stdres, 2)
-```
-
-```{r}
-#| echo: false
-#| fig-height: 2.8
-#| fig-cap: "紅色：比「無關」時預期的多；藍色：比預期少。絕對值大於 2 值得注意"
-cm <- as.data.frame(as.table(commute))
-plot_residuals(cda_crosstab(cm, "年級", "通勤", count = "Freq"))
-```
-
-大三騎機車的多、搭公車的少。
-
-::: {.callout-note collapse="true"}
-## 公式（點開查看）
-$H_0$：兩個變數獨立。期望次數 $\hat\mu_{ij} = n_{i+}n_{+j}/n$：
-
-$$X^2 = \sum_{i,j}\frac{(n_{ij}-\hat\mu_{ij})^2}{\hat\mu_{ij}}, \qquad G^2 = 2\sum_{i,j} n_{ij}\log\frac{n_{ij}}{\hat\mu_{ij}}, \qquad df = (I-1)(J-1)$$
-
-標準化殘差 $\dfrac{n_{ij}-\hat\mu_{ij}}{\sqrt{\hat\mu_{ij}(1-\hat\pi_{i+})(1-\hat\pi_{+j})}}$
-:::
-
-::: {.callout-important}
-## X² 和 G² 的比較
-兩者都比較「實際」和「無關時預期」的次數，大樣本時結果幾乎一樣（這裡 X² = `r round(ct$statistic, 2)`，G² = `r round(2 * sum(commute * log(commute / ct$expected)), 2)`）。樣本小時兩者都不可靠，而不是哪一個比較好，此時改用精確檢定。
-:::
-
-## 期望次數太小：卡方 vs Fisher
-
-例子：朋友說她喝得出手搖飲是不是無糖。準備 8 杯（4 杯無糖、4 杯全糖），她猜對 6 杯。（假想資料，仿照 Fisher 的品茶實驗）
-
-```{r}
-drink <- matrix(c(3, 1, 1, 3), nrow = 2,
-                dimnames = list(實際 = c("無糖", "全糖"), 她猜 = c("無糖", "全糖")))
-drink
-chisq.test(drink, correct = FALSE)$expected   # 每格只有 2
-```
-
-```{r}
-c(卡方 = chisq.test(drink, correct = FALSE)$p.value,
-  Fisher = fisher.test(drink)$p.value)
-```
+例子：朋友說她喝得出手搖飲是不是無糖。8 杯裡（4 杯無糖、4 杯全糖）她猜對 6 杯。
 
 | 方法 | P 值 | 說明 |
 |---|---|---|
-| 卡方 | 0.157 | 期望次數太小，大樣本近似**可能不可靠** |
-| Fisher 精確檢定 | 0.486 | 不用大樣本近似，Skill 在這種情況以它為主 |
+| 卡方檢定 | `r f3(drink_chi)` | 每格的期望次數只有 2，大樣本近似**可能不可靠** |
+| Fisher 精確檢定 | `r f3(drink_fisher)` | 不需要大樣本，這種情況以它為主 |
 
-兩種都 > 0.05：**8 杯猜對 6 杯，證據還不足以說她喝得出來**。
+兩個都 > 0.05：8 杯猜對 6 杯，證據還不足以說她喝得出來。
 
-::: {.callout-note}
-## 什麼時候算「期望次數太小」？
-Skill 用常見的 Cochran 準則：2×2 表只要有一格期望次數 < 5；更大的表有任何一格 < 1，或超過 20% 的格子 < 5。這是實務上的提醒標準，不是「一定不能做卡方」。真正的重點是表格稀不稀疏，而不是總樣本數。
+- 什麼時候算「期望次數太小」：2×2 表有一格 < 5；更大的表有一格 < 1，或超過 20% 的格子 < 5（Cochran 準則）。重點是表格稀不稀疏，不是總人數。
+
+::: {.callout-note collapse="true"}
+## 公式與延伸：mid-P（點開查看）
+$$X^2 = \sum_{i,j}\frac{(n_{ij}-\hat\mu_{ij})^2}{\hat\mu_{ij}}, \qquad \hat\mu_{ij} = \frac{n_{i+}n_{+j}}{n}$$
+
+Fisher 精確檢定固定行列總和，用超幾何分配算出「比觀察到的更極端」的機率。因為分配是離散的，小樣本時偏保守。**mid-P** 是一種替代做法，這個例子 mid-P = `r f3(drink_midp)`。Skill 第一版為了避免同時給好幾種 P 值，只報 Fisher；mid-P 留作之後的延伸。
 :::
+
+## 3. 變數有順序：卡方 vs 趨勢檢定
+
+例子：每天滑手機的時間（<1、1–3、3–5、>5 小時）越長，睡眠品質越差嗎？
+
+| 方法 | 結果 | 差別 |
+|---|---|---|
+| 卡方檢定 | X² = `r f2(phone_chi$statistic)`（df = 3） | 把四個時段當成沒有順序，只說「有關」 |
+| 趨勢檢定 | M² = `r f2(phone_m2$statistic)`（df = 1） | 只檢定「越久越差」，證據集中在 1 個自由度，P 值更小，還告訴你方向 |
+
+- 結果是二元、解釋變數有順序（像這個例子）叫 **Cochran–Armitage 趨勢檢定**；兩個都有順序叫 **linear-by-linear association 檢定**。
+- 每個類別要給一個分數（這裡用各時段中點），類別間距不相等時，分數會影響結果。
+- 名目變數（例如通勤方式）沒有順序，**不能**做趨勢檢定；數字代碼 1、2、3、4 也不代表有順序。
 
 ::: {.callout-note collapse="true"}
 ## 公式（點開查看）
-固定列總和與欄總和後，$n_{11}$ 服從超幾何分配：
-
-$$P(n_{11}) = \frac{\binom{n_{1+}}{n_{11}}\binom{n_{2+}}{n_{+1}-n_{11}}}{\binom{n}{n_{+1}}}$$
-
-這裡 $P(0),\dots,P(4) = 0.014, 0.229, 0.514, 0.229, 0.014$。雙尾 P 值 ＝ 機率不大於觀察表的總和 $= 0.014+0.229+0.229+0.014 = 0.486$。
+以類別分數算出樣本相關係數 $r$：$M^2 = (n-1)r^2 \sim \chi^2_1$。
 :::
 
-::: {.callout-note collapse="true"}
-## 延伸：mid-P（Skill 第一版不使用，點開查看）
-- 因為超幾何分配是離散的，Fisher 精確檢定在小樣本下**偏保守**：實際犯型一錯誤的機率比設定的 α 小。
-- **mid-P** 是一種替代做法：把「等於觀察值」那一項的機率只算一半。這個例子的 mid-P = `r round(epitools::ormidp.test(3, 1, 1, 3)$two.sided, 3)`，比 Fisher 的 0.486 小。
-- Skill 第一版為了避免同時給好幾種 P 值讓使用者混淆，**正式輸出只保留 Fisher 精確檢定的 P 值**。
-- mid-P 只作為補充知識，留給之後的延伸版本。
-:::
+## 4. 有第三個變數：合併看 vs 分層看
 
-## 變數有順序：卡方 vs 趨勢檢定
-
-例子：每天滑手機的時間越長，睡眠品質越差嗎？（假想資料）
+例子：A、B 兩家補習班的考上率。合併來看 A 比較好，但分成「基礎好」「基礎差」兩群學生呢？
 
 ```{r}
-phone <- matrix(c(40, 20,
-                  45, 35,
-                  30, 40,
-                  15, 35), ncol = 2, byrow = TRUE,
-                dimnames = list(滑手機 = c("<1小時", "1-3小時", "3-5小時", ">5小時"), 睡眠 = c("好", "差")))
-phone
-```
-
-**方法一：卡方檢定**（把四個時段當成沒有順序）
-
-```{r}
-chisq.test(phone)
-```
-
-**方法二：Cochran–Armitage 趨勢檢定**（睡眠是二元結果、滑手機時間有順序；給每個時段一個分數，只檢定「越多越…」）
-
-```{r}
-x_score <- c(0.5, 2, 4, 6)                     # 各時段的中點
-d <- as.data.frame(as.table(phone))
-u <- rep(x_score[as.integer(d$滑手機)], d$Freq)
-v <- rep(ifelse(d$睡眠 == "差", 1, 0), d$Freq)
-M2 <- (length(u) - 1) * cor(u, v)^2
-c(M2 = M2, p = pchisq(M2, df = 1, lower.tail = FALSE))
-
-# 換一組分數（等距 1, 2, 3, 4）看結論會不會變
-M2_eq <- (length(u) - 1) * cor(match(u, x_score), v)^2
-c(M2_等距 = M2_eq, p = pchisq(M2_eq, df = 1, lower.tail = FALSE))
-```
-
-```{r}
-#| echo: false
-#| fig-height: 2.8
-d$滑手機 <- factor(d$滑手機, levels = rownames(phone), ordered = TRUE)
-plot_trend(cda_trend(d, "滑手機", "睡眠", count = "Freq", ordinal = "滑手機", x_scores = x_score, success = "差"))
-```
-
-卡方 X² = `r round(chisq.test(phone)$statistic, 2)`（df = 3），M² = `r round(M2, 2)`（df = 1）：卡方的差異**幾乎全部來自線性趨勢**，M² 的 P 值小了一個數量級以上。換成等距分數 M² = `r round(M2_eq, 2)`，結論不變。
-
-::: {.callout-important}
-## 比較
-- 卡方的自由度是 3，M² 只有 1：**真的有趨勢時，M² 把證據集中起來，P 值通常更小**
-- M² 還告訴你**方向**（越滑越差），卡方只說「有關」
-- 代價：結果受**分數**影響。類別間距不相等時用中點，並換一組分數（例如 1、2、3、4）看結論會不會變。Skill 會自動做這個比較
-- 名目變數（例如通勤方式）沒有順序，**不能**做趨勢檢定
-:::
-
-::: {.callout-note}
-## 兩種趨勢檢定，名稱不要混用
-| 資料 | 方法 |
-|---|---|
-| 結果是二元、解釋變數有順序（這個例子） | Cochran–Armitage 趨勢檢定 |
-| 兩個變數都有順序（例如滑手機時間 × 睡眠品質 好／普通／差） | Linear-by-linear association 檢定 |
-| 解釋變數是性別、組別等二元名目，結果有順序 | Skill 第一版不做趨勢檢定，要先確認分析目的 |
-
-兩者的統計量算法相同（都是 $M^2$），差別在資料型態。類別的順序一定要由使用者確認，數字代碼 1、2、3、4 不代表有順序。
-:::
-
-::: {.callout-note collapse="true"}
-## 公式（點開查看）
-X 的分數 $u_1 \le \dots \le u_I$、Y 的分數 $v_1 \le \dots \le v_J$，以分數算樣本相關係數 $r$：
-
-$$M^2 = (n-1)r^2 \sim \chi^2_1 \quad (H_0: \text{獨立})$$
-
-Y 是二元、X 有序時稱為 Cochran–Armitage 趨勢檢定；X、Y 都有序時稱為 linear-by-linear association 檢定。
-:::
-
-## 有第三個變數：合併看 vs 分層看
-
-例子：A、B 兩家補習班的考上率。只看合併的結果，A 比較好；但分「基礎好」「基礎差」兩群學生看呢？（假想資料）
-
-```{r}
-cram <- array(c(468, 162, 72, 12,      # 基礎好：A 考上、B 考上、A 沒考上、B 沒考上
-                110, 384, 50, 142),    # 基礎差
-              dim = c(2, 2, 2),
-              dimnames = list(補習班 = c("A", "B"), 結果 = c("考上", "沒考上"), 學生 = c("基礎好", "基礎差")))
-ftable(cram, row.vars = c("學生", "補習班"))
-```
-
-```{r}
-odds_ratio <- function(t) (t[1, 1] * t[2, 2]) / (t[1, 2] * t[2, 1])
-c(合併 = odds_ratio(margin.table(cram, c(1, 2))),
-  基礎好 = odds_ratio(cram[, , 1]),
-  基礎差 = odds_ratio(cram[, , 2]))
-```
-
-```{r}
-#| echo: false
 #| fig-height: 2.8
 cd <- as.data.frame(as.table(cram))
 plot_stratified(cda_stratified(cd, "補習班", "結果", "學生", count = "Freq", success = "考上"))
 ```
 
-::: {.callout-important}
-## Simpson 悖論
-合併看 A 較好（勝算比 > 1），但**每一群學生裡 B 都比較好**（勝算比 < 1）。原因：A 收的多是基礎好的學生，而基礎好的人本來就容易考上。**要以控制後（分層）的結果為準。**
-:::
+| 看法 | 勝算比（A 相對於 B） |
+|---|---|
+| 合併看 | `r f2(cram_marg)`（A 較好） |
+| 基礎好的學生 | `r f2(cram_good)`（B 較好） |
+| 基礎差的學生 | `r f2(cram_weak)`（B 較好） |
 
-控制「學生基礎」之後，補習班和考上還有沒有關係？用 **CMH 檢定**。分層之前要先想清楚：學生基礎是**同時影響**選補習班和考上的變數（干擾變數），所以應該控制；如果是補習班造成的結果（中介變數），就不應該控制。
-
-```{r}
-mantelhaen.test(cram, correct = FALSE)
-```
-
-```{r}
-#| include: false
-cmh <- mantelhaen.test(cram, correct = FALSE)
-```
-
-P = `r round(cmh$p.value, 3)`：控制學生基礎後，**B 補習班的考上勝算比較高**，共同勝算比 `r round(cmh$estimate, 2)`（A 相對於 B）。
+- 這就是 **Simpson 悖論**：A 收的多是基礎好的學生，而基礎好的人本來就容易考上。
+- 控制學生程度後用 **CMH 檢定**：P = `r f3(cram_cmh$p.value)`，共同勝算比 `r f2(cram_cmh$estimate)`，B 的考上勝算較高。
+- 分層前要先想清楚：學生程度同時影響選補習班和考上，是**干擾變數**，應該控制；如果是補習班造成的結果（中介變數），就不該控制。
+- 各層方向不一致時，不能只報一個共同勝算比，要逐層報告。
 
 ::: {.callout-note collapse="true"}
 ## 公式（點開查看）
-第 $k$ 層的**條件勝算比** $\hat\theta_{XY(k)} = n_{11k}n_{22k}/(n_{12k}n_{21k})$；忽略 Z 合併後算的是**邊際勝算比**。
-
-CMH 檢定 $H_0$：每一層 $\theta_{XY(k)} = 1$（控制 Z 後無關）。它等於 logistic 模型 $\text{logit}[P(Y=1)] = \alpha + \beta x + \beta_k^Z$ 中 $H_0:\beta = 0$ 的 score 檢定，$e^\beta$ 是各層共同的勝算比（這是組員 Part 2 的模型）。
+第 $k$ 層的條件勝算比 $\hat\theta_{XY(k)} = n_{11k}n_{22k}/(n_{12k}n_{21k})$。CMH 檢定的虛無假設是每一層 $\theta_{XY(k)} = 1$（控制第三個變數後沒有關聯）。
 :::
-
-| 看法 | 回答的問題 | 什麼時候會誤導 |
-|---|---|---|
-| 合併（邊際）勝算比 | 不管 Z，整體來看 | Z 同時和 X、Y 有關時（Simpson 悖論） |
-| 分層（條件）勝算比 | Z 固定時 | 層數多、每層樣本小時不穩 |
-| 共同勝算比＋CMH | 控制 Z 後的整體效果 | 各層方向相反或差很多時：要逐層報告。同質性檢定只是輔助，P > 0.05 不代表一定適合 |
 
 ## 重點整理
 
 ::: {.callout-tip}
 ## 選方法的口訣
 1. **先問獨立**：同一人多筆、配對 → 不用這頁的方法
-2. **再問順序**（要經確認）：二元結果 × 有序 → Cochran–Armitage；有序 × 有序 → linear-by-linear，都比卡方有力
-3. **看期望次數**：太小（Cochran 準則）→ Fisher
-4. **想控制別的變數**：先確認它是干擾變數 → 分層＋CMH，逐層看勝算比，留意 Simpson 悖論
-5. **報效果大小**：P 值只說有沒有證據，勝算比、比例差才說多強
+2. **再問順序**：有順序 → 趨勢檢定比卡方有力
+3. **看期望次數**：太小 → Fisher
+4. **想控制別的變數**：先確認是干擾變數 → 分層＋CMH，留意 Simpson 悖論
+5. **報關聯大小**：P 值只說有沒有證據，比例差、相對風險、勝算比才說多大
 :::
 
 ## 參考文獻
