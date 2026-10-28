@@ -154,41 +154,71 @@ test_that("methods.md code reproduces the engine's numbers", {
   expect_equal((m[1, 1] * m[2, 2]) / (m[1, 2] * m[2, 1]), 0.63642, tolerance = 1e-4)
 })
 
-# ---- example_data/: the live-demo files give the numbers promised in README.md ----
-# Each Skill result is also recomputed with base R only (chisq.test, cor, mantelhaen.test).
+# ---- example_data/student-por.csv: the live-demo file gives the numbers promised in README.md ----
+# The file is the UCI original, unmodified (semicolon-separated). Results are recomputed with base R.
 
-demo_file <- function(f) file.path(root, "example_data", f)
+demo_file <- file.path(root, "example_data", "student-por.csv")
 
-test_that("01 Titanic sex × survived: crosstab on raw rows", {
-  r <- run_skill(list(analysis = "crosstab", x = "Sex", y = "Survived", success = "Yes",
-                      levels = list(Sex = c("Female", "Male"), Survived = c("Yes", "No"))),
-                 data = demo_file("01_crosstab_titanic.csv"))
+test_that("student-por: address × internet is a valid crosstab", {
+  r <- run_skill(list(analysis = "crosstab", x = "address", y = "internet", success = "yes",
+                      levels = list(address = c("U", "R"), internet = c("yes", "no"))), data = demo_file)
+  expect_equal(r$status, 0)
+  expect_equal(stat_of(r$json, "Pearson X2"), 20.06, tolerance = 1e-3)
+  est <- setNames(r$json$estimates$estimate, r$json$estimates$measure)
+  expect_equal(unname(est[c("difference of proportions", "relative risk", "odds ratio")]),
+               c(0.1615, 1.2467, 2.3435), tolerance = 1e-3)
+  d <- read.csv2(demo_file)
+  expect_equal(unname(chisq.test(table(d$address, d$internet), correct = FALSE)$statistic), 20.06, tolerance = 1e-3)
+})
+
+test_that("student-por: paid × higher warns that expected counts are small", {
+  r <- run_skill(list(analysis = "crosstab", x = "paid", y = "higher", success = "yes",
+                      levels = list(paid = c("yes", "no"), higher = c("yes", "no"))), data = demo_file)
+  expect_equal(r$status, 0)
+  expect_true("LOW_EXPECTED" %in% r$json$warnings$code)
+})
+
+test_that("student-por: the overview asks whether Mjob and Fjob are matched answers", {
+  p <- cda_profile(read_data(demo_file))
+  hint <- p$structure$hints[[1]]
+  expect_equal(hint$type, "possible_matched_pairs_wide")
+  expect_equal(as.character(hint$columns), c("Mjob", "Fjob"))
+  expect_equal(p$structure$default, "needs_confirmation")
+})
+
+# ---- Built-in R data: aggregated counts, trend and stratified analysis ----
+
+tmp_csv <- function(df) { f <- tempfile(fileext = ".csv"); write.csv(df, f, row.names = FALSE); f }
+titanic_file <- tmp_csv(as.data.frame(Titanic))
+housing_file <- tmp_csv(aggregate(Freq ~ Infl + Sat, data = MASS::housing, sum))
+berkeley_file <- tmp_csv(as.data.frame(UCBAdmissions))
+
+test_that("Titanic sex × survived: crosstab on aggregated counts", {
+  r <- run_skill(list(analysis = "crosstab", x = "Sex", y = "Survived", count = "Freq", success = "Yes",
+                      levels = list(Sex = c("Female", "Male"), Survived = c("Yes", "No"))), data = titanic_file)
   expect_equal(r$status, 0)
   expect_equal(stat_of(r$json, "Pearson X2"), 456.874, tolerance = 1e-5)
   est <- setNames(r$json$estimates$estimate, r$json$estimates$measure)
   expect_equal(unname(est[c("difference of proportions", "relative risk", "odds ratio")]),
                c(0.5199, 3.452, 10.147), tolerance = 1e-3)
-  d <- read.csv(demo_file("01_crosstab_titanic.csv"))
-  expect_equal(unname(chisq.test(table(d$Sex, d$Survived), correct = FALSE)$statistic), 456.874, tolerance = 1e-5)
 })
 
-test_that("02 housing influence × satisfaction: trend test on aggregated counts", {
+test_that("housing influence × satisfaction: trend test on aggregated counts", {
   lv <- c("Low", "Medium", "High")
   r <- run_skill(list(analysis = "trend", x = "Infl", y = "Sat", count = "Freq",
-                      ordinal = list("Infl", "Sat"), levels = list(Infl = lv, Sat = lv)),
-                 data = demo_file("02_trend_housing.csv"))
+                      ordinal = list("Infl", "Sat"), levels = list(Infl = lv, Sat = lv)), data = housing_file)
   expect_equal(r$status, 0)
   expect_equal(stat_of(r$json, "Linear-by-linear association (M2)"), 101.3675, tolerance = 1e-5)
-  h <- read.csv(demo_file("02_trend_housing.csv"))
+  h <- read.csv(housing_file)
   u <- rep(match(h$Infl, lv), h$Freq); v <- rep(match(h$Sat, lv), h$Freq)
   expect_equal((length(u) - 1) * cor(u, v)^2, 101.3675, tolerance = 1e-5)
 })
 
-test_that("03 Berkeley gender × admission by department: stratified analysis", {
+test_that("Berkeley gender × admission by department: stratified analysis", {
   r <- run_skill(list(analysis = "stratified", x = "Gender", y = "Admit", z = "Dept", count = "Freq",
                       success = "Admitted", levels = list(Gender = c("Male", "Female"),
                                                           Admit = c("Admitted", "Rejected"))),
-                 data = demo_file("03_stratified_berkeley.csv"))
+                 data = berkeley_file)
   expect_equal(r$status, 0)
   est <- setNames(r$json$estimates$estimate, r$json$estimates$measure)
   expect_equal(unname(est["marginal odds ratio"]), 1.8411, tolerance = 1e-4)
@@ -203,16 +233,16 @@ test_that("03 Berkeley gender × admission by department: stratified analysis", 
 test_that("profile_data.R writes the overview table; describe_question.R writes plots and facts", {
   dir <- tempfile("describe-")
   status <- system2("Rscript", c(shQuote(file.path(skill, "scripts", "profile_data.R")),
-                                 shQuote(demo_file("02_trend_housing.csv")), shQuote(dir)), stdout = FALSE, stderr = FALSE)
+                                 shQuote(housing_file), shQuote(dir)), stdout = FALSE, stderr = FALSE)
   expect_equal(status, 0)
-  overview <- readLines(file.path(dir, "資料總覽_02_trend_housing.md"), encoding = "UTF-8")
+  overview <- readLines(list.files(dir, pattern = "^資料總覽_.*[.]md$", full.names = TRUE), encoding = "UTF-8")
   expect_true(any(grepl("合計 1,681", overview, fixed = TRUE)))        # counts weighted by Freq
   expect_true(any(grepl("Low：627（37.3%）", overview, fixed = TRUE)))
 
   q_file <- file.path(dir, "question.json")
   writeLines('{"x": "Gender", "y": "Admit", "z": "Dept", "count": "Freq"}', q_file)
   status <- system2("Rscript", c(shQuote(file.path(skill, "scripts", "describe_question.R")),
-                                 shQuote(demo_file("03_stratified_berkeley.csv")), shQuote(q_file), shQuote(dir)),
+                                 shQuote(berkeley_file), shQuote(q_file), shQuote(dir)),
                     stdout = FALSE, stderr = FALSE)
   expect_equal(status, 0)
   chk <- jsonlite::fromJSON(file.path(dir, "check.json"))
@@ -222,10 +252,3 @@ test_that("profile_data.R writes the overview table; describe_question.R writes 
   expect_true(all(file.exists(file.path(dir, c("bar_Gender.png", "bar_Admit.png", "bar_Dept.png", "relation.png")))))
 })
 
-test_that("04 paired student courses: each student appears twice, so the profile flags repeated measures", {
-  p <- cda_profile(read_data(demo_file("04_paired_student_courses.csv")))
-  hint <- p$structure$hints[[1]]
-  expect_equal(hint$type, "repeated_measures")
-  expect_equal(as.character(hint$columns), c("student_id", "course"))
-  expect_equal(p$structure$default, "needs_confirmation")
-})

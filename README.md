@@ -89,32 +89,36 @@ claude.ai 網頁版：在「設定 → 功能」開啟程式碼執行，再到�
 
 ## 示範資料
 
-| 檔案 | 內容 | 資料形式 | 對應分析 |
-|---|---|---|---|
-| `01_crosstab_titanic.csv` | 鐵達尼號 2201 位乘客的艙等、性別、年齡、是否存活（R 內建 `Titanic`） | 原始資料（一人一列） | 列聯表（`crosstab`） |
-| `02_trend_housing.csv` | 哥本哈根 1681 戶住戶對管理的影響力 × 居住滿意度（R 套件 MASS 的 `housing`，合併房型與接觸程度） | 長格式＋次數欄（`Freq`） | 趨勢檢定（`trend`） |
-| `03_stratified_berkeley.csv` | 1973 年柏克萊研究所 6 個科系、4526 位申請者的性別與錄取結果（R 內建 `UCBAdmissions`） | 長格式＋次數欄（`Freq`） | 分層分析（`stratified`） |
-| `04_paired_student_courses.csv` | 358 位葡萄牙高中生的數學與葡萄牙文是否及格，**每人 2 列**（UCI 學生資料） | 原始資料（同一人多列） | **不適合**：資料不獨立，示範 Skill 會偵測並拒絕、轉介 McNemar |
+`example_data/student-por.csv`：UCI 公開的葡萄牙高中生資料（葡萄牙文課）：649 位學生、一人一列、33 欄、分號分隔（見「資料來源」）。示範會用到的欄位：
+
+| 欄位 | 內容 |
+|---|---|
+| `address` | 住在都市（U）或鄉下（R） |
+| `internet` | 家裡有沒有網路（yes、no） |
+| `Dalc`、`Walc` | 平日、週末的喝酒程度（1 很少 – 5 很多） |
+| `paid` | 有沒有上付費補習（yes、no） |
+| `higher` | 想不想讀大學（yes、no） |
+| `studytime` | 每週讀書時間（1 少於 2 小時、2 為 2–5 小時、3 為 5–10 小時、4 超過 10 小時） |
+
+其他欄位的意思見 UCI 網站的資料說明。同一份資料可以問「能做」和「不能做」的問題：`Dalc` 和 `Walc` 是同一個學生的兩個回答，比較兩者是配對資料，不能用卡方。
 
 ## 試用示範資料
 
-每一份都一樣：把資料放到一個空資料夾，在那裡啟動 Claude Code，輸入問題；skill 停下來確認時照表回答。
+開一個新對話，上傳 `student-por.csv`，輸入「請用 categorical-association 分析這份資料」，再照下表回答；每一題開一個新對話。`make-skill-tutorial.html` 的「跟著做」有同樣的文字，可以直接複製。
 
-| 資料 | 輸入 | 確認時回答 | 預期結果 |
-|---|---|---|---|
-| `01` | 鐵達尼號上女性的存活率比男性高嗎？ | 每一列是不同的乘客；成功 = 存活（Yes）；用推薦的 | 存活率 73.2% vs 21.2%；X² = 456.87，P < 0.001；比例差 0.52、相對風險 3.45、勝算比 10.15 |
-| `02` | 住戶對管理的影響力越大，居住滿意度越高嗎？ | 兩個都是有序（Low < Medium < High）；不是配對，是同一戶回答的兩個不同問題；用推薦的 | Linear-by-linear association 檢定：M² = 101.37（df = 1），P < 0.001；忽略順序的 X² = 106.18（df = 4） |
-| `03` | 柏克萊研究所錄取有性別差異嗎？控制科系之後呢？ | 每一列是一群不同的申請者；成功 = 錄取（Admitted）；科系是同時影響申請與錄取的變數，要控制；用推薦的 | 合併看勝算比 1.84（男生較易錄取）；控制科系後共同勝算比 0.90（95% CI 0.77–1.06），CMH 的 P = 0.217；警告：各科系勝算比方向不一致、同質性檢定 P = 0.001，要逐科系報告 |
-| `04` | 數學和葡萄牙文的及格率一樣嗎？ | 對，每個學生都有兩列，一列數學、一列葡萄牙文 | 第 1 步就提醒 `student_id` 重複；卡方／Fisher 標 ❌（同一學生的兩次觀察不獨立），建議改用 McNemar 檢定並轉介相關資料的 Skill，不會給出卡方結果 |
+| 問題 | 確認時回答 | 預期結果 |
+|---|---|---|
+| ✅ 住在都市或鄉下，和家裡有沒有網路有關嗎？ | 每一列是不同的學生；這題用不到 Mjob、Fjob；成功 = yes（有網路）；用推薦的 | 有網路的比例：都市 81.6%、鄉下 65.5%；X² = 20.06，P < 0.001；比例差 0.16、相對風險 1.25、勝算比 2.34 |
+| ❌ 學生平日和週末的喝酒程度一樣嗎？ | 對，Dalc 和 Walc 是同一個學生回答的平日和週末喝酒程度 | 卡方標 ❌（同一個學生的兩個回答不獨立），說明是配對資料、要用配對資料的方法，不會給出卡方結果 |
+| ⚠️ 有沒有上付費補習，和想不想讀大學有關嗎？ | 每一列是不同的學生；成功 = yes（想讀大學）；用推薦的 | 有補習的只有 39 人，最小期望次數 4.15，依 Cochran 準則提醒卡方可能不可靠，以 Fisher 精確檢定為主：P = 0.788，證據不足 |
+| 每週讀書時間越長，越想讀大學嗎？ | studytime 是有序的：1 < 2 < 3 < 4（數字越大讀越久）；每一列是不同的學生；成功 = yes；用推薦的 | Cochran–Armitage 趨勢檢定 M² = 22.97（df = 1），P < 0.001；對照忽略順序的 X² = 34.30（df = 3） |
 
 示範重點：
 
-- `01` 的第 1 步只會給總表；說出問題後，第 2 步才畫性別與存活的圖。
-- `02` 的兩欄類別都是 Low／Medium／High，skill 會懷疑是配對資料而停下來問。這是刻意保留的示範：資料證明不了的事，skill 一定要問人。
-- `03` 合併來看男生較易錄取，分科系後差異幾乎消失，是控制變數改變結論的經典例子。
-- `04` 看起來是普通的「科目 × 及格」表，但每個學生出現兩次。這是示範「不適合」的案例：skill 要自己發現資料不獨立、停下來問、拒絕做卡方並轉介。
-
-另外也可以用 `01` 試其他問題，例如「艙等和存活有關嗎？」（4×2 表、看標準化殘差），或「控制年齡（大人／小孩）後，性別和存活還有關嗎？」（分層分析）。
+- 第 1 步只會給總表；說出問題後，第 2 步才畫相關變數的圖。
+- 第 1 步會問 `Mjob`、`Fjob`（媽媽、爸爸的工作）是不是同一個人的兩次回答：選項相同，資料證明不了，所以要問人。
+- `studytime` 是數字代碼，skill 不會自動當成有序，一定先問使用者。
+- 同一份資料，問題不同，判斷就不同：skill 看的是問題用到哪些欄位、這些欄位之間是什麼關係。
 
 ## 測試
 
@@ -127,8 +131,8 @@ Rscript -e "testthat::test_dir('dev/tests')"
 
 - `dev/tests/test-association.R`：用教科書的例子（政黨×性別、阿斯匹靈、品茶、飲酒與畸形、死刑判決）檢查每個數字都和課本一致
 - `dev/tests/test-association.R` 也檢查注意事項清單的規則：Cochran 準則、0 cell 與空類別、缺失比例、各層方向不一致、小組人數提醒、兩種趨勢檢定的命名與拒絕條件
-- `dev/tests/test-skill.R`：資料判斷、recode、階段 1–4 的程式端對端、模式 2 的 R 程式碼和引擎結果一致、不支援的分析會拒絕、上面四份示範資料的預期結果（04 要被偵測為重複觀察）（另用 R 內建函式重算）
-- `dev/tests/test-python.R`：Python 版和 R 版逐項比對：第 1–2 步的總表與檢查數字（10 份資料、8 個問題），以及第 4 步 15 個分析案例的 `result.json` 與報告檔（沒有 Python 時自動略過）
+- `dev/tests/test-skill.R`：資料判斷、recode、階段 1–4 的程式端對端、模式 2 的 R 程式碼和引擎結果一致、不支援的分析會拒絕、示範資料的預期結果（`Mjob`／`Fjob` 要被偵測為可能的配對資料），以及用 R 內建資料（`Titanic`、`UCBAdmissions`、MASS 的 `housing`）測次數表、趨勢與分層分析（另用 R 內建函式重算）
+- `dev/tests/test-python.R`：Python 版和 R 版逐項比對：第 1–2 步的總表與檢查數字（11 份資料、9 個問題），以及第 4 步 16 個分析案例的 `result.json` 與報告檔（沒有 Python 時自動略過）
 
 沒有下載課本資料時，用到這些資料的測試會自動略過。
 
@@ -138,10 +142,18 @@ Rscript -e "testthat::test_dir('dev/tests')"
 
 ### 本 repo 收錄的資料
 
-- `example_data/01_crosstab_titanic.csv`：R 內建資料集 `Titanic`（R Core Team, 2026），由次數表展開成一人一列。原始資料：Dawson, R. J. M. (1995). The "unusual episode" data revisited. *Journal of Statistics Education*, 3(3).
-- `example_data/02_trend_housing.csv`：R 套件 MASS 的 `housing`（Venables & Ripley, 2002），把房型與接觸程度合併加總。原始資料：Madsen, M. (1976). Statistical analysis of multiple contingency tables. Two examples. *Scandinavian Journal of Statistics*, 3, 97–106.
-- `example_data/03_stratified_berkeley.csv`：R 內建資料集 `UCBAdmissions`（R Core Team, 2026），轉成長格式。原始資料：Bickel, P. J., Hammel, E. A., & O'Connell, J. W. (1975). Sex bias in graduate admissions: Data from Berkeley. *Science*, 187(4175), 398–404.
-- `example_data/04_paired_student_courses.csv`：Cortez, P. (2008). Student Performance [Dataset]. UCI Machine Learning Repository. <https://doi.org/10.24432/C5TG7T>。授權：[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。**修改**：用原作者提供的配對程式找出數學與葡萄牙文兩科都修的學生，只保留能唯一配對的 358 位並編代號 `student_id`；轉成每人 2 列的長格式；新增 `pass`（G3 ≥ 10）；只保留 `student_id`、`course`、`school`、`sex`、`pass` 五欄。
+- `example_data/student-por.csv`：Cortez, P. (2008). Student Performance [Dataset]. UCI Machine Learning Repository. <https://doi.org/10.24432/C5TG7T>。授權：[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。UCI 的 `student-por.csv`。
+
+### 測試用的 R 內建資料（不另存檔案）
+
+測試程式在執行時由 R 產生，不放在 repo 裡：
+
+- `Titanic`（R Core Team, 2026）。原始資料：Dawson, R. J. M. (1995). The "unusual episode" data revisited. *Journal of Statistics Education*, 3(3).
+- `UCBAdmissions`（R Core Team, 2026）。原始資料：Bickel, P. J., Hammel, E. A., & O'Connell, J. W. (1975). Sex bias in graduate admissions: Data from Berkeley. *Science*, 187(4175), 398–404.
+- MASS 套件的 `housing`（Venables & Ripley, 2002），把房型與接觸程度合併加總。原始資料：Madsen, M. (1976). Statistical analysis of multiple contingency tables. Two examples. *Scandinavian Journal of Statistics*, 3, 97–106.
+
+### 其他收錄的資料
+
 - `dev/demo/student_por.csv`：Cortez, P. (2008). Student Performance [Dataset]. UCI Machine Learning Repository. <https://doi.org/10.24432/C5TG7T>。授權：[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。**修改**：由分號分隔改成逗號分隔，並新增 `pass` 欄（G3 ≥ 10 為 pass，否則 fail）；其餘內容未更動。相關論文：Cortez, P., & Silva, A. (2008). Using data mining to predict secondary school student performance. In *Proceedings of 5th Future Business Technology Conference* (pp. 5–12).
 
 ### 不收錄、由測試時下載的資料

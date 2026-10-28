@@ -1,0 +1,32 @@
+{
+  "n": 649,
+  "n_missing_dropped": 0,
+  "n_levels": {
+    "address": 2,
+    "internet": 2
+  },
+  "table": {
+    "rows": ["U", "R"],
+    "cols": ["yes", "no"],
+    "counts": [
+      [369, 83],
+      [129, 68]
+    ]
+  },
+  "smallest_group": {
+    "variable": "address",
+    "level": "R",
+    "n": 197
+  },
+  "smallest_outcome_category": {
+    "variable": "internet",
+    "level": "no",
+    "n": 151
+  },
+  "min_expected": 45.8351309707242,
+  "cells_expected_below_5": 0,
+  "cells_total": 4,
+  "zero_cells": 0,
+  "plots": ["bar_address.png", "bar_internet.png", "relation.png"],
+  "recode_notes": []
+}

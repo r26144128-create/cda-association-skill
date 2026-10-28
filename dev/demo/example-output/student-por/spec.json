@@ -1,0 +1,1 @@
+{"question":"住在都市或鄉下，和家裡有沒有網路有關嗎？","structure":"independent","types":{"address":"binary","internet":"binary"},"method_id":"crosstab","reason":"兩個不同的二元變數、每一列是不同的學生，用列聯表與卡方檢定","analysis":"crosstab","x":"address","y":"internet","success":"yes","design":"cross-sectional","levels":{"address":["U","R"],"internet":["yes","no"]}}

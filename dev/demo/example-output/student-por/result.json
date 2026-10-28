@@ -1,0 +1,106 @@
+{
+  "method": "crosstab",
+  "method_label": "列聯表分析：卡方獨立性檢定（chi-squared test of independence）",
+  "book_ref": "§2.1–2.4, §2.6",
+  "tier": "A",
+  "estimates": [
+    {
+      "measure": "difference of proportions",
+      "estimate": 0.161549346390549,
+      "lower": 0.0880766362447172,
+      "upper": 0.238375665124207,
+      "ci_method": "score",
+      "book_ref": "§2.2.2"
+    },
+    {
+      "measure": "relative risk",
+      "estimate": 1.24670714138712,
+      "lower": 1.12427461857643,
+      "upper": 1.40315303337591,
+      "ci_method": "score",
+      "book_ref": "§2.2.3"
+    },
+    {
+      "measure": "odds ratio",
+      "estimate": 2.34351358924068,
+      "lower": 1.60557598761501,
+      "upper": 3.42061415051048,
+      "ci_method": "score",
+      "book_ref": "§2.3.3"
+    }
+  ],
+  "tests": [
+    {
+      "test": "Pearson X2",
+      "statistic": 20.0564228934333,
+      "df": 1,
+      "p_value": 7.51905737129187e-06,
+      "book_ref": "§2.4.3"
+    },
+    {
+      "test": "Likelihood-ratio G2",
+      "statistic": 19.1646315815491,
+      "df": 1,
+      "p_value": 1.19914768530377e-05,
+      "book_ref": "§2.4.3"
+    },
+    {
+      "test": "Fisher exact (two-sided)",
+      "statistic": null,
+      "df": null,
+      "p_value": 1.26483266023326e-05,
+      "book_ref": "§2.6"
+    }
+  ],
+  "tables": {
+    "counts": {
+      "rows": ["U", "R"],
+      "cols": ["yes", "no"],
+      "values": [
+        [369, 83],
+        [129, 68]
+      ]
+    },
+    "expected": {
+      "rows": ["U", "R"],
+      "cols": ["yes", "no"],
+      "values": [
+        [346.84, 105.16],
+        [151.16, 45.84]
+      ]
+    },
+    "row_proportions": {
+      "rows": ["U", "R"],
+      "cols": ["yes", "no"],
+      "values": [
+        [0.8164, 0.1836],
+        [0.6548, 0.3452]
+      ]
+    },
+    "standardized_residuals": {
+      "rows": ["U", "R"],
+      "cols": ["yes", "no"],
+      "values": [
+        [4.48, -4.48],
+        [-4.48, 4.48]
+      ]
+    }
+  },
+  "warnings": [
+    {
+      "code": "OR_NOT_RR",
+      "message": "比例不算小，勝算比不能當成相對風險來解釋（「幾倍的機率」要看 RR）。",
+      "book_ref": "§2.3.4"
+    }
+  ],
+  "facts": ["樣本數 n = 649；address 有 2 類，internet 有 2 類。", "Pearson 卡方 X² = 20.06（df = 1），P = < 0.001；概似比 G² = 19.16。", "獨立假設下的期望次數最小為 45.84；小於 5 的格子 0 / 4。", "Fisher 精確檢定雙尾 P = < 0.001。", "2×2 表四格的標準化殘差絕對值相同，以其中一格為代表：address=U、internet=yes（4.48，實際次數比獨立時預期的多）。", "internet=yes 的比例：U 組為 0.816（369/452），R 組為 0.655（129/197）。", "比例差（U − R）= 0.1615，95% CI [0.0881, 0.2384]。", "相對風險 RR（U / R）= 1.25，95% CI [1.12, 1.40]。", "勝算比 OR（U 相對於 R，internet=yes 的勝算）= 2.34，95% CI [1.61, 3.42]。"],
+  "notes": {
+    "variables": {
+      "x": "address",
+      "y": "internet"
+    },
+    "reminder": "卡方檢定只回答「有沒有證據顯示有關聯」，不代表關聯有多強；強度要看比例、勝算比與殘差（§2.4.7）。"
+  },
+  "plots": ["conditional_props.png", "residuals.png"],
+  "report": "分析報告_student-por_crosstab.md"
+}

@@ -7,6 +7,8 @@ format:
     toc: true
     toc-title: 目錄
     embed-resources: true
+    code-copy: true
+    code-overflow: wrap
     theme: cosmo
 execute:
   warning: false
@@ -56,7 +58,7 @@ f2 <- function(x) formatC(x, format = "f", digits = 2)
 
 ::: {.callout-note}
 ## 目標
-讓 Claude 像修過類別資料分析的助教：**先看資料、判斷能不能用、和使用者確認，再用 R 算，最後用白話解釋並提醒限制**。範圍是「兩個類別變數有沒有關聯」。
+讓 Claude 像修過類別資料分析的助教：**先看資料、判斷能不能用、和使用者確認，再用程式算，最後用白話解釋並提醒限制**。範圍是「兩個類別變數有沒有關聯」。
 :::
 
 ## Skill 是什麼？
@@ -81,21 +83,19 @@ flowchart LR
     Q --> P2[2 依問題畫圖]
     P2 --> P3[3 對照注意事項清單<br/>✅ ⚠️ ❌]
     P3 --> STOP{{停：等使用者 OK}}
-    STOP --> P4[4 R 計算<br/>畫圖、報告]
+    STOP --> P4[4 程式計算<br/>畫圖、報告]
     P4 --> P5[5 白話解釋]
 ```
 
 三個設計重點：
 
-- **AI 判斷，R 計算**：Claude 不可以自己算任何數字，所有統計量都由 R 算出來，Claude 只能引用。
+- **AI 判斷，程式計算**：Claude 不可以自己算任何數字，所有統計量都由程式算出來，Claude 只能引用。
 - **資料證明不了的事一定要問人**：變數有沒有順序、每一列是不是不同的人、研究設計，只有使用者知道，所以第 1 步和第 3 步都會停下來。
-- **範圍外就轉介，不硬算**：多個解釋變數交給組員的類別模型 Skill，配對或重複測量交給相關資料 Skill。
+- **範圍外不硬算**：超出「兩個類別變數有沒有關聯」的問題，Skill 會說明不能做，不會硬算。
 
-兩種用法都能完整跑完：在自己電腦用 Claude Code 時，用電腦裡的 R 計算；在網頁版或桌面版，雲端沒有 R，改用 Python 版程式自動計算。Python 版是照 R 版逐行改寫的，自動測試逐項比對兩邊的數字、結論與警告，結果相同。
+## 給 Skill 的知識：注意事項清單
 
-## 我們的知識：注意事項清單
-
-我們把「**統計人看到一份資料，會先停下來想一想的狀況**」整理成 `references/checklist.md`。第 3 步就是拿資料去對照這份清單，替每個方法標示：
+我們把**分析前需要注意的狀況**整理成一份注意事項清單（`references/checklist.md`），這就是我們給 Skill 的知識。第 3 步會拿資料去對照這份清單，替每個方法標示：
 
 - ✅ **可以使用**
 - ⚠️ **可以使用，但需要提醒**（說明問題與要用的方法）
@@ -120,27 +120,17 @@ mvp <- mvp[nzchar(mvp)]
 
 ### 它怎麼提醒使用者不能亂做
 
-舉三個例子，分別是「不能做」「可以做但要注意」「解釋時要小心」：
-
-| 情境 | Skill 怎麼做 |
-|---|---|
-| **同一個學生出現兩次**（一列數學、一列葡萄牙文），想比較兩科的及格率 | ❌ 不能做卡方：同一個人的兩次成績彼此相關。它會先問「同一個學生是不是出現了好幾次」，確認後改建議配對資料的方法，轉介給組員的 Skill |
-| **樣本太小**：只有 8 杯手搖飲的猜甜度實驗 | ⚠️ 可以做，但卡方不準：它會提醒期望次數太小，改用 Fisher 精確檢定 |
-| **勝算比 = 10** | 💬 解釋時提醒：這是「勝算」的 10 倍，不是「機率」的 10 倍，機率的倍數要看相對風險 |
-
-這些提醒都是 Skill 的程式依清單規則自動產生的，示範時會實際看到。
-
 第一版真正會擋下來或標示的是下面 **9 條核心規則**，其他的只做文字提醒，避免第一版太複雜：
 
-::: {.columns}
-::: {.column width="33%"}
+::: {.columns .rules}
+::: {.column width="31%"}
 **分析前一定問使用者**
 
-1. 每一列是不是不同、彼此無關的人？不是就不做，轉介組員的 Skill
+1. 每一列是不是不同、彼此無關的人？不是就不做卡方，建議配對資料的方法
 2. 類別有沒有順序？數字代碼不會自動當成有順序
 3. 資料是怎麼收集的？例如 case-control 研究就不報相對風險
 :::
-::: {.column width="34%"}
+::: {.column width="36%"}
 **程式自動檢查**
 
 4. 是不是整理好的次數表？確認次數欄是人數
@@ -149,12 +139,14 @@ mvp <- mvp[nzchar(mvp)]
 7. 有缺失值 → 報告刪了多少筆，比例高就提醒
 8. 要控制第三個變數 → 先問它的角色；各層結果方向不一致時，要逐層報告
 :::
-::: {.column width="33%"}
+::: {.column width="31%"}
 **解釋結果時**
 
 9. 一律附上關聯大小與信賴區間；不顯著寫「證據不足」而不是「沒關係」；不說「造成」；勝算比不是機率的倍數
 :::
 :::
+
+<style>.rules .column { overflow-wrap: anywhere; padding-right: 0.8em; box-sizing: border-box; }</style>
 
 ::: {.callout-note collapse="true"}
 ## 清單是怎麼寫出來的（點開查看）
@@ -174,47 +166,146 @@ mvp <- mvp[nzchar(mvp)]
 - **網頁版或桌面版**：在「設定 → 功能」開啟程式碼執行，再到「Skills」上傳 `categorical-association.zip`。詳細步驟見 repo 的 `實作教學.md`。
 - **Claude Code**：安裝 R 套件（`Rscript categorical-association/scripts/install_packages.R`），把 `categorical-association` 資料夾複製到 `.claude/skills/`。
 
-### 示範：一份可以用、一份不能用
+### 跟著做：要貼給 Claude 的話
+
+開一個新對話，把 `example_data/student-por.csv` 拖進對話框，再依序貼上下面的文字；每一題開一個新對話。按框框右邊的按鈕就能複製。
+
+::: {.panel-tabset}
+
+#### ✅ 住家 × 網路
+
+1. 上傳資料後貼上：
+
+   ```{.default}
+   請用 categorical-association 分析這份資料
+   ```
+
+2. 它給完總表、問想回答什麼問題時貼上：
+
+   ```{.default}
+   住在都市或鄉下，和家裡有沒有網路有關嗎？
+   ```
+
+3. 它停下來確認時貼上：
+
+   ```{.default}
+   每一列是不同的學生；這題用不到 Mjob、Fjob；成功 = yes（有網路）；用推薦的
+   ```
+
+#### ❌ 平日 vs 週末喝酒
+
+1. 上傳資料後貼上：
+
+   ```{.default}
+   請用 categorical-association 分析這份資料
+   ```
+
+2. 它問想回答什麼問題時貼上：
+
+   ```{.default}
+   學生平日和週末的喝酒程度一樣嗎？
+   ```
+
+3. 它停下來確認時貼上：
+
+   ```{.default}
+   對，Dalc 和 Walc 是同一個學生回答的平日和週末喝酒程度
+   ```
+
+#### 練習：補習 × 讀大學 ⚠️
+
+1. 上傳資料後貼上：
+
+   ```{.default}
+   請用 categorical-association 分析這份資料
+   ```
+
+2. 它問想回答什麼問題時貼上：
+
+   ```{.default}
+   有沒有上付費補習，和想不想讀大學有關嗎？
+   ```
+
+3. 它停下來確認時貼上：
+
+   ```{.default}
+   每一列是不同的學生；成功 = yes（想讀大學）；用推薦的
+   ```
+
+#### 練習：讀書時間
+
+1. 上傳資料後貼上：
+
+   ```{.default}
+   請用 categorical-association 分析這份資料
+   ```
+
+2. 它問想回答什麼問題時貼上：
+
+   ```{.default}
+   每週讀書時間越長，越想讀大學嗎？
+   ```
+
+3. 它停下來確認時貼上：
+
+   ```{.default}
+   studytime 是有序的：1 < 2 < 3 < 4（數字越大讀越久）；每一列是不同的學生；成功 = yes；用推薦的
+   ```
+
+:::
+
+<style>.panel-tabset div.sourceCode { background: #f3f6fa; border: 1px solid #d3dce6; border-radius: 6px; } .panel-tabset .code-copy-button { opacity: 1; }</style>
+
+### 示範：同一份資料，一題可以、一題不行
 
 ```{r}
 #| include: false
-# Example 01, stages 1, 2 and 4 (the full run Claude does in Claude Code)
-d01 <- file.path(out_root, "01_titanic")
-unlink(d01, recursive = TRUE)
-run_script("profile_data.R", c("example_data/01_crosstab_titanic.csv", d01))
-q01 <- tempfile(fileext = ".json")
-writeLines('{"x": "Sex", "y": "Survived", "levels": {"Survived": ["Yes", "No"]}}', q01)
-run_script("describe_question.R", c("example_data/01_crosstab_titanic.csv", q01, d01))
-t01 <- run_skill(list(question = "鐵達尼號上女性的存活率比男性高嗎？", structure = "independent",
-                      types = list(Sex = "binary", Survived = "binary"), method_id = "crosstab",
-                      reason = "兩個二元變數、每一列是不同的乘客，用列聯表與卡方檢定",
-                      analysis = "crosstab", x = "Sex", y = "Survived", success = "Yes", design = "cross-sectional",
-                      levels = list(Sex = c("Female", "Male"), Survived = c("Yes", "No"))),
-                 "example_data/01_crosstab_titanic.csv", out = d01)
-es <- function(m) t01$json$estimates$estimate[t01$json$estimates$measure == m]
-st <- function(t) t01$json$tests$statistic[t01$json$tests$test == t]
-# Example 04, stage 1 only: the Skill stops here
-d04 <- file.path(out_root, "04_paired")
-unlink(d04, recursive = TRUE)
-run_script("profile_data.R", c("example_data/04_paired_student_courses.csv", d04))
+# The demo file, stages 1, 2 and 4 for the valid question (the full run Claude does in Claude Code)
+demo_csv <- "example_data/student-por.csv"
+d_ok <- file.path(out_root, "student-por")
+unlink(d_ok, recursive = TRUE)
+run_script("profile_data.R", c(demo_csv, d_ok))
+q_ok <- tempfile(fileext = ".json")
+writeLines('{"x": "address", "y": "internet", "levels": {"address": ["U", "R"], "internet": ["yes", "no"]}}', q_ok)
+run_script("describe_question.R", c(demo_csv, q_ok, d_ok))
+t_ok <- run_skill(list(question = "住在都市或鄉下，和家裡有沒有網路有關嗎？", structure = "independent",
+                       types = list(address = "binary", internet = "binary"), method_id = "crosstab",
+                       reason = "兩個不同的二元變數、每一列是不同的學生，用列聯表與卡方檢定",
+                       analysis = "crosstab", x = "address", y = "internet", success = "yes", design = "cross-sectional",
+                       levels = list(address = c("U", "R"), internet = c("yes", "no"))),
+                  demo_csv, out = d_ok)
+es <- function(m) t_ok$json$estimates$estimate[t_ok$json$estimates$measure == m]
+st <- function(t) t_ok$json$tests$statistic[t_ok$json$tests$test == t]
 ```
 
-**01 鐵達尼號（✅ 可以用）**：2201 位乘客，一人一列。問「女性的存活率比男性高嗎？」
+資料：`student-por.csv`，UCI 公開的葡萄牙高中生資料（Cortez, 2008；CC BY 4.0）：649 位學生、一人一列、33 欄，包括學校、性別、住在都市或鄉下、家裡有沒有網路、平日和週末的喝酒程度、想不想讀大學、三次成績等。
 
-1. 第 1 步只給總表，然後問想回答什麼問題。
-2. 第 2 步畫出性別與存活的關係圖：
+第 1 步的總表就出現提醒：
 
-   ![](dev/demo/example-output/01_titanic/relation.png){width=70%}
+```{r}
+#| echo: false
+#| results: asis
+ov <- readLines(list.files(d_ok, pattern = "^資料總覽_.*[.]md$", full.names = TRUE), encoding = "UTF-8")
+cat(grep("^- ", ov, value = TRUE), sep = "\n")
+```
 
-3. 第 3 步：兩個都是二元變數、期望次數都夠大，卡方標 ✅；它問「每一列是不是不同的乘客」「研究設計」「成功指哪一類」，等使用者確認。
-4. 第 4–5 步：X² = `r f2(st("Pearson X2"))`；女性存活率 73.2%、男性 21.2%；相對風險 `r f2(es("relative risk"))`、勝算比 `r f2(es("odds ratio"))`。並提醒勝算比是「勝算」的倍數，不是機率的倍數。
+媽媽和爸爸的工作（`Mjob`、`Fjob`）選項完全相同，資料看不出它們是不是同一個人的兩次回答，所以 Skill 先問人。
+
+**✅ 問「住在都市或鄉下，和家裡有沒有網路有關嗎？」**
+
+1. 用到的是 `address` 和 `internet` 兩個不同的變數，每一列是不同的學生；期望次數都夠大，卡方標 ✅。它仍會停下來問「每一列是不是不同的學生」「成功指哪一類」，等使用者確認。
+2. 第 2 步畫出住家與網路的關係圖：
+
+   ![](dev/demo/example-output/student-por/relation.png){width=70%}
+
+3. 第 4–5 步：家裡有網路的比例，都市 81.6%、鄉下 65.5%；X² = `r f2(st("Pearson X2"))`；相對風險 `r f2(es("relative risk"))`、勝算比 `r f2(es("odds ratio"))`，並提醒勝算比是「勝算」的倍數，不是機率的倍數。
 
 ::: {.callout-note collapse="true"}
 ## R 自動產生的報告檔（點開查看）
 ```{r}
 #| echo: false
 #| results: asis
-report <- md_body(list.files(d01, pattern = "^分析報告.*\\.md$", full.names = TRUE))
+report <- md_body(list.files(d_ok, pattern = "^分析報告.*\\.md$", full.names = TRUE))
 # Book section numbers belong to the Skill's own files; leave them out of the page.
 report <- gsub("（[^（）]*§[^（）]*）|\\([^()]*§[^()]*\\)", "", report)
 drop_col <- function(lines, name) {
@@ -233,24 +324,15 @@ cat(grep("^!\\[", report, value = TRUE, invert = TRUE), sep = "\n")
 ```
 :::
 
-**04 同一批學生的兩科成績（❌ 不能直接用）**：358 位學生，每人兩列（數學、葡萄牙文）。問「數學和葡萄牙文的及格率一樣嗎？」看起來是一張普通的「科目 × 及格」表，一般會直接做卡方。
+**❌ 問「學生平日和週末的喝酒程度一樣嗎？」**
 
-第 1 步的總表就出現提醒：
+這題比的是 `Dalc`（平日）和 `Walc`（週末），也就是**同一個學生的兩個回答**。依清單第 8 條，卡方標 ❌：同一個人的兩次回答彼此相關，不符合獨立的假設。Skill 不會給出卡方的結果，而是說明這是配對資料，要用配對資料的方法（例如比較兩次回答分布的邊際同質性檢定）。
 
-```{r}
-#| echo: false
-#| results: asis
-ov04 <- readLines(file.path(d04, "資料總覽_04_paired_student_courses.md"), encoding = "UTF-8")
-cat(grep("^- ", ov04, value = TRUE), sep = "\n")
-```
-
-使用者確認「每個學生有兩列」之後，依清單第 8 條，卡方與 Fisher 都標 ❌：同一個學生的兩次觀察彼此相關，不符合獨立的假設。Skill 不會給出卡方的結果，而是建議改用配對資料的 **McNemar 檢定**，並轉介組員的相關資料 Skill。
-
-另外兩份示範資料（`02` 住戶滿意度、`03` 柏克萊錄取）的問題與預期結果，見 README。
+同一份資料，問題不同，判斷就不同：Skill 看的不是檔案本身，而是**問題用到哪些欄位、這些欄位之間是什麼關係**。
 
 ## 合不合理？
 
-所有數字都由 R 計算。我們拿參考書籍（Agresti, 2019）裡的例子讓 Skill 計算，**算出來的數字都和書中的答案一致**，例如政黨×性別的卡方 X² = 12.57、孕期飲酒的趨勢檢定 M² = 6.57、死刑判決的條件勝算比 0.43。
+所有數字都由程式計算。我們拿參考書籍（Agresti, 2019）裡的例子讓 Skill 計算，**算出來的數字都和書中的答案一致**。
 
 ::: {.callout-note collapse="true"}
 ## 開發過程：AI 怎麼幫忙、我們怎麼決定（點開查看）
@@ -265,29 +347,25 @@ cat(grep("^- ", ov04, value = TRUE), sep = "\n")
 | 流程 | 老師要 Skill 有自己的架構 | 列出流程選項 | **組員設計流程**：先給總表、問想問什麼、畫圖、三級標示，OK 後才分析 |
 | 知識 | 老師要 Skill 有我們的知識 | 依組員訂的主題起草注意事項 | **組員逐條修正規則**，訂出 MVP 9 條 |
 | 網頁版 | 網頁版沒有 R，示範與同學使用都要能完整跑完 | 寫一套 Python 版，和 R 版逐項比對 | 網頁版全部用 Python、Claude Code 用 R；兩邊結果由自動測試保證一致 |
+| 示範資料 | R 套件的資料 AI 可能看過；希望一份公開資料就能示範可以和不可以 | 改用 UCI 學生資料，同一份資料問不同問題 | **只用一份公開資料**：住家 × 網路 ✅、平日 vs 週末喝酒 ❌ |
 :::
 
-## 限制與下一步
-
-::: {.callout-warning}
 ## 限制
+
 - 變數型態的猜測是**經驗規則**（欄位名稱、類別數），一定要使用者確認
-- 只做兩個類別變數（最多再控制一個分層變數）
 - 資料**是否獨立**最終取決於使用者對資料的了解
 - 注意事項清單的門檻（小組 10 人、缺失 5%／20%）是提醒標準，不是理論上的界線
-:::
 
-**下一步**：用更多真實資料在新對話中實測，並依實測結果補充注意事項清單。
 
 ## 參考文獻
 
 Agresti, A. (2019). *An Introduction to Categorical Data Analysis* (3rd ed.). Wiley.
 
-Bickel, P. J., Hammel, E. A., & O'Connell, J. W. (1975). Sex bias in graduate admissions: Data from Berkeley. *Science*, 187(4175), 398–404.（R 內建 `UCBAdmissions`）
+Bickel, P. J., Hammel, E. A., & O'Connell, J. W. (1975). Sex bias in graduate admissions: Data from Berkeley. *Science*, 187(4175), 398–404.（測試用，R 內建 `UCBAdmissions`）
 
-Cortez, P. (2008). Student Performance [Dataset]. UCI Machine Learning Repository. <https://doi.org/10.24432/C5TG7T>（CC BY 4.0；我們的修改見 README）
+Cortez, P. (2008). Student Performance [Dataset]. UCI Machine Learning Repository. <https://doi.org/10.24432/C5TG7T>（CC BY 4.0）
 
-Dawson, R. J. M. (1995). The "unusual episode" data revisited. *Journal of Statistics Education*, 3(3).（R 內建 `Titanic`）
+Dawson, R. J. M. (1995). The "unusual episode" data revisited. *Journal of Statistics Education*, 3(3).（測試用，R 內建 `Titanic`）
 
 Doll, R., & Hill, A. B. (1950). Smoking and carcinoma of the lung. *British Medical Journal*, 2(4682), 739–748.（測試用的 case-control 例子）
 
@@ -295,7 +373,7 @@ Fisher, R. A. (1935). *The Design of Experiments*. Oliver & Boyd.（測試用的
 
 Graubard, B. I., & Korn, E. L. (1987). Choice of column scores for testing independence in ordered 2 × K contingency tables. *Biometrics*, 43, 471–476.（測試用的孕期飲酒與畸形）
 
-Madsen, M. (1976). Statistical analysis of multiple contingency tables. Two examples. *Scandinavian Journal of Statistics*, 3, 97–106.（MASS 套件的 `housing`）
+Madsen, M. (1976). Statistical analysis of multiple contingency tables. Two examples. *Scandinavian Journal of Statistics*, 3, 97–106.（測試用，MASS 套件的 `housing`）
 
 R Core Team (2026). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing.
 

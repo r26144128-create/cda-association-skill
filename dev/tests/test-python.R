@@ -21,8 +21,15 @@ run_both <- function(stage, data, question = NULL) {
 }
 read_md <- function(dir) readLines(list.files(dir, pattern = "\\.md$", full.names = TRUE), encoding = "UTF-8")
 
-data_files <- c(file.path(root, "example_data", c("01_crosstab_titanic.csv", "02_trend_housing.csv",
-                                                  "03_stratified_berkeley.csv", "04_paired_student_courses.csv")),
+tmp_csv <- function(df) { p <- tempfile(fileext = ".csv"); write.csv(df, p, row.names = FALSE); p }
+titanic_file <- tmp_csv(as.data.frame(Titanic))
+housing_file <- tmp_csv(aggregate(Freq ~ Infl + Sat, data = MASS::housing, sum))
+berkeley_file <- tmp_csv(as.data.frame(UCBAdmissions))
+long_file <- tmp_csv(data.frame(student_id = rep(sprintf("S%02d", 1:20), each = 2),
+                                course = rep(c("math", "portuguese"), 20),
+                                pass = rep(c("pass", "fail", "pass", "pass"), 10)))
+
+data_files <- c(file.path(root, "example_data", "student-por.csv"), titanic_file, housing_file, berkeley_file, long_file,
                 file.path(root, "dev", "demo", "student_por.csv"),
                 file.path(root, "dev", "tests", "data", c("Political.dat", "Crabs.dat", "Abortion.dat",
                                                           "Envir_opinions.dat")))
@@ -53,10 +60,11 @@ test_that("stage 2: Python question check matches R (levels, recode, strata, mis
   d$romantic[sample(nrow(d), 40)] <- NA
   write.csv(d, with_na, row.names = FALSE, na = "")
   questions <- list(
-    list(data_files[1], '{"x":"Sex","y":"Survived","z":"Age","levels":{"Survived":["Yes","No"]}}'),
-    list(data_files[1], '{"x":"Class","y":"Survived"}'),
-    list(data_files[2], '{"x":"Infl","y":"Sat","count":"Freq","levels":{"Infl":["Low","Medium","High"],"Sat":["Low","Medium","High"]}}'),
-    list(data_files[3], '{"x":"Gender","y":"Admit","z":"Dept","count":"Freq"}'),
+    list(data_files[1], '{"x":"address","y":"internet","levels":{"internet":["yes","no"]}}'),
+    list(titanic_file, '{"x":"Sex","y":"Survived","z":"Age","count":"Freq","levels":{"Survived":["Yes","No"]}}'),
+    list(titanic_file, '{"x":"Class","y":"Survived","count":"Freq"}'),
+    list(housing_file, '{"x":"Infl","y":"Sat","count":"Freq","levels":{"Infl":["Low","Medium","High"],"Sat":["Low","Medium","High"]}}'),
+    list(berkeley_file, '{"x":"Gender","y":"Admit","z":"Dept","count":"Freq"}'),
     list(mal_file, '{"x":"alcohol","y":"malformation","count":"count","levels":{"alcohol":["0","<1","1-2","3-5",">=6"]}}'),
     list(student, '{"x":"studytime","y":"passed","z":"school","recode":{"passed":{"from":"G3","breaks":[10],"labels":["fail","pass"]}}}'),
     list(student, '{"x":"W2","y":"pass","recode":{"W2":{"from":"Walc","map":{"1":"少","2":"少","3":"多","4":"多","5":"多"}}}}'),
@@ -89,8 +97,7 @@ test_that("stage 4: Python analysis matches R on crosstab, trend, stratified, ed
   skip_if_not(has_python, "Python with pandas and matplotlib not available")
   skip_if_not(system2(python, c("-c", shQuote("import scipy")), stdout = FALSE, stderr = FALSE) == 0, "scipy not available")
   student <- file.path(root, "dev", "demo", "student_por.csv")
-  ex <- function(f) file.path(root, "example_data", f)
-  tmp_csv <- function(df) { p <- tempfile(fileext = ".csv"); write.csv(df, p, row.names = FALSE); p }
+  raw <- file.path(root, "example_data", "student-por.csv")
   tea <- tmp_csv(data.frame(poured = rep(c("milk", "tea"), each = 4),
                             guess = c("milk", "milk", "milk", "tea", "milk", "tea", "tea", "tea")))
   cc <- tmp_csv(data.frame(smoker = c("yes", "yes", "no", "no"), cancer = c("case", "control", "case", "control"),
@@ -102,10 +109,12 @@ test_that("stage 4: Python analysis matches R on crosstab, trend, stratified, ed
     list(student, '{"analysis":"crosstab","x":"romantic","y":"pass","success":"pass","design":"cross-sectional","levels":{"romantic":["yes","no"],"pass":["pass","fail"]}}'),
     list(student, '{"analysis":"trend","x":"studytime","y":"pass","success":"pass","ordinal":["studytime"],"x_scores":[1,3.5,7.5,12],"levels":{"studytime":["1","2","3","4"],"pass":["pass","fail"]}}'),
     list(student, '{"analysis":"stratified","x":"romantic","y":"pass","z":"school","success":"pass","levels":{"romantic":["yes","no"],"pass":["pass","fail"]}}'),
-    list(ex("01_crosstab_titanic.csv"), '{"analysis":"crosstab","x":"Sex","y":"Survived","success":"Yes","levels":{"Sex":["Female","Male"],"Survived":["Yes","No"]}}'),
-    list(ex("01_crosstab_titanic.csv"), '{"analysis":"crosstab","x":"Class","y":"Survived"}'),
-    list(ex("02_trend_housing.csv"), '{"analysis":"trend","x":"Infl","y":"Sat","count":"Freq","ordinal":["Infl","Sat"],"levels":{"Infl":["Low","Medium","High"],"Sat":["Low","Medium","High"]}}'),
-    list(ex("03_stratified_berkeley.csv"), '{"analysis":"stratified","x":"Gender","y":"Admit","z":"Dept","count":"Freq","success":"Admitted","levels":{"Gender":["Male","Female"],"Admit":["Admitted","Rejected"]}}'),
+    list(raw, '{"analysis":"crosstab","x":"address","y":"internet","success":"yes","levels":{"address":["U","R"],"internet":["yes","no"]}}'),
+    list(raw, '{"analysis":"trend","x":"studytime","y":"higher","success":"yes","ordinal":["studytime"],"levels":{"studytime":["1","2","3","4"],"higher":["yes","no"]}}'),
+    list(titanic_file, '{"analysis":"crosstab","x":"Sex","y":"Survived","count":"Freq","success":"Yes","levels":{"Sex":["Female","Male"],"Survived":["Yes","No"]}}'),
+    list(titanic_file, '{"analysis":"crosstab","x":"Class","y":"Survived","count":"Freq"}'),
+    list(housing_file, '{"analysis":"trend","x":"Infl","y":"Sat","count":"Freq","ordinal":["Infl","Sat"],"levels":{"Infl":["Low","Medium","High"],"Sat":["Low","Medium","High"]}}'),
+    list(berkeley_file, '{"analysis":"stratified","x":"Gender","y":"Admit","z":"Dept","count":"Freq","success":"Admitted","levels":{"Gender":["Male","Female"],"Admit":["Admitted","Rejected"]}}'),
     list(mal_file, '{"analysis":"trend","x":"alcohol","y":"malformation","count":"count","ordinal":["alcohol"],"x_scores":[0,0.5,1.5,4,7],"success":"present","levels":{"alcohol":["0","<1","1-2","3-5",">=6"],"malformation":["present","absent"]}}'),
     list(tea, '{"analysis":"crosstab","x":"poured","y":"guess"}'),
     list(cc, '{"analysis":"crosstab","x":"smoker","y":"cancer","count":"n","design":"case-control"}'),

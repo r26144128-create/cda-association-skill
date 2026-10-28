@@ -1,0 +1,602 @@
+{
+  "n_rows": 649,
+  "n_cols": 33,
+  "variables": [
+    {
+      "name": "school",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "GP": 423,
+        "MS": 226
+      },
+      "examples": ["GP", "MS"],
+      "range": null
+    },
+    {
+      "name": "sex",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "F": 383,
+        "M": 266
+      },
+      "examples": ["F", "M"],
+      "range": null
+    },
+    {
+      "name": "age",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 8,
+      "type_guess": "continuous",
+      "needs_confirmation": false,
+      "reason": "欄名像年齡，視為數值變數",
+      "levels": {
+        "15": 112,
+        "16": 177,
+        "17": 179,
+        "18": 140,
+        "19": 32,
+        "20": 6,
+        "21": 2,
+        "22": 1
+      },
+      "examples": ["18", "17", "15", "16", "19"],
+      "range": [15, 22]
+    },
+    {
+      "name": "address",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "R": 197,
+        "U": 452
+      },
+      "examples": ["U", "R"],
+      "range": null
+    },
+    {
+      "name": "famsize",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "GT3": 457,
+        "LE3": 192
+      },
+      "examples": ["GT3", "LE3"],
+      "range": null
+    },
+    {
+      "name": "Pstatus",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "A": 80,
+        "T": 569
+      },
+      "examples": ["A", "T"],
+      "range": null
+    },
+    {
+      "name": "Medu",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 5,
+      "type_guess": "ordinal_or_nominal_code",
+      "needs_confirmation": true,
+      "reason": "只有 5 個連續整數（0–4），可能是有序量表或類別代碼",
+      "levels": {
+        "0": 6,
+        "1": 143,
+        "2": 186,
+        "3": 139,
+        "4": 175
+      },
+      "examples": ["4", "1", "3", "2", "0"],
+      "range": [0, 4]
+    },
+    {
+      "name": "Fedu",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 5,
+      "type_guess": "ordinal_or_nominal_code",
+      "needs_confirmation": true,
+      "reason": "只有 5 個連續整數（0–4），可能是有序量表或類別代碼",
+      "levels": {
+        "0": 7,
+        "1": 174,
+        "2": 209,
+        "3": 131,
+        "4": 128
+      },
+      "examples": ["4", "1", "2", "3", "0"],
+      "range": [0, 4]
+    },
+    {
+      "name": "Mjob",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 5,
+      "type_guess": "nominal",
+      "needs_confirmation": false,
+      "reason": "文字類別，看起來沒有順序",
+      "levels": {
+        "at_home": 135,
+        "health": 48,
+        "other": 258,
+        "services": 136,
+        "teacher": 72
+      },
+      "examples": ["at_home", "health", "other", "services", "teacher"],
+      "range": null
+    },
+    {
+      "name": "Fjob",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 5,
+      "type_guess": "nominal",
+      "needs_confirmation": false,
+      "reason": "文字類別，看起來沒有順序",
+      "levels": {
+        "at_home": 42,
+        "health": 23,
+        "other": 367,
+        "services": 181,
+        "teacher": 36
+      },
+      "examples": ["teacher", "other", "services", "health", "at_home"],
+      "range": null
+    },
+    {
+      "name": "reason",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 4,
+      "type_guess": "nominal",
+      "needs_confirmation": false,
+      "reason": "文字類別，看起來沒有順序",
+      "levels": {
+        "course": 285,
+        "home": 149,
+        "other": 72,
+        "reputation": 143
+      },
+      "examples": ["course", "other", "home", "reputation"],
+      "range": null
+    },
+    {
+      "name": "guardian",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 3,
+      "type_guess": "nominal",
+      "needs_confirmation": false,
+      "reason": "文字類別，看起來沒有順序",
+      "levels": {
+        "father": 153,
+        "mother": 455,
+        "other": 41
+      },
+      "examples": ["mother", "father", "other"],
+      "range": null
+    },
+    {
+      "name": "traveltime",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 4,
+      "type_guess": "ordinal_or_nominal_code",
+      "needs_confirmation": true,
+      "reason": "只有 4 個連續整數（1–4），可能是有序量表或類別代碼",
+      "levels": {
+        "1": 366,
+        "2": 213,
+        "3": 54,
+        "4": 16
+      },
+      "examples": ["2", "1", "3", "4"],
+      "range": [1, 4]
+    },
+    {
+      "name": "studytime",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 4,
+      "type_guess": "ordinal_or_nominal_code",
+      "needs_confirmation": true,
+      "reason": "只有 4 個連續整數（1–4），可能是有序量表或類別代碼",
+      "levels": {
+        "1": 212,
+        "2": 305,
+        "3": 97,
+        "4": 35
+      },
+      "examples": ["2", "3", "1", "4"],
+      "range": [1, 4]
+    },
+    {
+      "name": "failures",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 4,
+      "type_guess": "ordinal_or_nominal_code",
+      "needs_confirmation": true,
+      "reason": "只有 4 個連續整數（0–3），可能是有序量表或類別代碼",
+      "levels": {
+        "0": 549,
+        "1": 70,
+        "2": 16,
+        "3": 14
+      },
+      "examples": ["0", "3", "1", "2"],
+      "range": [0, 3]
+    },
+    {
+      "name": "schoolsup",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "no": 581,
+        "yes": 68
+      },
+      "examples": ["yes", "no"],
+      "range": null
+    },
+    {
+      "name": "famsup",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "no": 251,
+        "yes": 398
+      },
+      "examples": ["no", "yes"],
+      "range": null
+    },
+    {
+      "name": "paid",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "no": 610,
+        "yes": 39
+      },
+      "examples": ["no", "yes"],
+      "range": null
+    },
+    {
+      "name": "activities",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "no": 334,
+        "yes": 315
+      },
+      "examples": ["no", "yes"],
+      "range": null
+    },
+    {
+      "name": "nursery",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "no": 128,
+        "yes": 521
+      },
+      "examples": ["yes", "no"],
+      "range": null
+    },
+    {
+      "name": "higher",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "no": 69,
+        "yes": 580
+      },
+      "examples": ["yes", "no"],
+      "range": null
+    },
+    {
+      "name": "internet",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "no": 151,
+        "yes": 498
+      },
+      "examples": ["no", "yes"],
+      "range": null
+    },
+    {
+      "name": "romantic",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 2,
+      "type_guess": "binary",
+      "needs_confirmation": false,
+      "reason": "只有 2 種值",
+      "levels": {
+        "no": 410,
+        "yes": 239
+      },
+      "examples": ["no", "yes"],
+      "range": null
+    },
+    {
+      "name": "famrel",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 5,
+      "type_guess": "ordinal_or_nominal_code",
+      "needs_confirmation": true,
+      "reason": "只有 5 個連續整數（1–5），可能是有序量表或類別代碼",
+      "levels": {
+        "1": 22,
+        "2": 29,
+        "3": 101,
+        "4": 317,
+        "5": 180
+      },
+      "examples": ["4", "5", "3", "1", "2"],
+      "range": [1, 5]
+    },
+    {
+      "name": "freetime",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 5,
+      "type_guess": "ordinal_or_nominal_code",
+      "needs_confirmation": true,
+      "reason": "只有 5 個連續整數（1–5），可能是有序量表或類別代碼",
+      "levels": {
+        "1": 45,
+        "2": 107,
+        "3": 251,
+        "4": 178,
+        "5": 68
+      },
+      "examples": ["3", "2", "4", "1", "5"],
+      "range": [1, 5]
+    },
+    {
+      "name": "goout",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 5,
+      "type_guess": "ordinal_or_nominal_code",
+      "needs_confirmation": true,
+      "reason": "只有 5 個連續整數（1–5），可能是有序量表或類別代碼",
+      "levels": {
+        "1": 48,
+        "2": 145,
+        "3": 205,
+        "4": 141,
+        "5": 110
+      },
+      "examples": ["4", "3", "2", "1", "5"],
+      "range": [1, 5]
+    },
+    {
+      "name": "Dalc",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 5,
+      "type_guess": "ordinal_or_nominal_code",
+      "needs_confirmation": true,
+      "reason": "只有 5 個連續整數（1–5），可能是有序量表或類別代碼",
+      "levels": {
+        "1": 451,
+        "2": 121,
+        "3": 43,
+        "4": 17,
+        "5": 17
+      },
+      "examples": ["1", "2", "5", "3", "4"],
+      "range": [1, 5]
+    },
+    {
+      "name": "Walc",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 5,
+      "type_guess": "ordinal_or_nominal_code",
+      "needs_confirmation": true,
+      "reason": "只有 5 個連續整數（1–5），可能是有序量表或類別代碼",
+      "levels": {
+        "1": 247,
+        "2": 150,
+        "3": 120,
+        "4": 87,
+        "5": 45
+      },
+      "examples": ["1", "3", "2", "4", "5"],
+      "range": [1, 5]
+    },
+    {
+      "name": "health",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 5,
+      "type_guess": "ordinal_or_nominal_code",
+      "needs_confirmation": true,
+      "reason": "只有 5 個連續整數（1–5），可能是有序量表或類別代碼",
+      "levels": {
+        "1": 90,
+        "2": 78,
+        "3": 124,
+        "4": 108,
+        "5": 249
+      },
+      "examples": ["3", "5", "1", "2", "4"],
+      "range": [1, 5]
+    },
+    {
+      "name": "absences",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 24,
+      "type_guess": "count_or_continuous",
+      "needs_confirmation": true,
+      "reason": "非負整數且值很多，可能是計數或連續量",
+      "levels": null,
+      "examples": ["4", "2", "6", "0", "10"],
+      "range": [0, 32]
+    },
+    {
+      "name": "G1",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 17,
+      "type_guess": "count_or_continuous",
+      "needs_confirmation": true,
+      "reason": "非負整數且值很多，可能是計數或連續量",
+      "levels": {
+        "0": 1,
+        "4": 2,
+        "5": 5,
+        "6": 9,
+        "7": 33,
+        "8": 42,
+        "9": 65,
+        "10": 95,
+        "11": 91,
+        "12": 82,
+        "13": 72,
+        "14": 71,
+        "15": 35,
+        "16": 22,
+        "17": 16,
+        "18": 7,
+        "19": 1
+      },
+      "examples": ["0", "9", "12", "14", "11"],
+      "range": [0, 19]
+    },
+    {
+      "name": "G2",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 16,
+      "type_guess": "count_or_continuous",
+      "needs_confirmation": true,
+      "reason": "非負整數且值很多，可能是計數或連續量",
+      "levels": {
+        "0": 7,
+        "5": 3,
+        "6": 7,
+        "7": 16,
+        "8": 40,
+        "9": 72,
+        "10": 83,
+        "11": 103,
+        "12": 86,
+        "13": 80,
+        "14": 54,
+        "15": 38,
+        "16": 25,
+        "17": 20,
+        "18": 14,
+        "19": 1
+      },
+      "examples": ["11", "13", "14", "12", "16"],
+      "range": [0, 19]
+    },
+    {
+      "name": "G3",
+      "n": 649,
+      "n_missing": 0,
+      "n_unique": 17,
+      "type_guess": "count_or_continuous",
+      "needs_confirmation": true,
+      "reason": "非負整數且值很多，可能是計數或連續量",
+      "levels": {
+        "0": 15,
+        "1": 1,
+        "5": 1,
+        "6": 3,
+        "7": 10,
+        "8": 35,
+        "9": 35,
+        "10": 97,
+        "11": 104,
+        "12": 72,
+        "13": 82,
+        "14": 63,
+        "15": 49,
+        "16": 36,
+        "17": 29,
+        "18": 15,
+        "19": 2
+      },
+      "examples": ["11", "12", "14", "13", "17"],
+      "range": [0, 19]
+    }
+  ],
+  "structure": {
+    "n_rows": 649,
+    "hints": [
+      {
+        "type": "possible_matched_pairs_wide",
+        "columns": ["Mjob", "Fjob"],
+        "evidence": "Mjob、Fjob 的類別完全相同（at_home/health/other/services/teacher）",
+        "question": "Mjob、Fjob 是不是「同一個人」在不同時間或不同題目的回答（配對資料）？還是只是剛好用相同選項的不同變數？",
+        "book_ref": "§8.1"
+      }
+    ],
+    "default": "needs_confirmation",
+    "note": "資料本身無法證明觀察值彼此獨立。第 1–7 章的方法都假設獨立（§1.1.3），請使用者確認每一列是否為不同的獨立個體。"
+  },
+  "file": "C:/Users/Administrator/Desktop/categorical analysis/cda-association-skill/example_data/student-por.csv"
+}
