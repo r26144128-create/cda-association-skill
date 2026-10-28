@@ -42,7 +42,8 @@ description: 分析兩個類別變數之間有沒有關聯（列聯表、卡方�
 
 - 一律執行 `scripts/` 裡的 Python 程式，**不可以自己另外寫 Python（或用 scipy、statsmodels）計算任何統計量**。
 - 執行環境沒有中文字型時，Python 版的圖會改用英文座標軸標題。
-- Python（pandas、matplotlib、scipy）也不能用時，才把 `references/methods.md` 裡對應方法的 R 程式碼依使用者的欄位名稱改好，交給使用者在 R／RStudio 執行並貼回輸出；貼回之前不可以自己算數字。
+- 對話裡**完全不能執行程式**時（例如沒有開啟「程式碼執行」，或在無痕對話中），先停下來告訴使用者：到「設定 → 功能」開啟程式碼執行，並改用一般對話重新開始。使用者說無法開啟時，才進入下一條。
+- Python（pandas、matplotlib、scipy）也不能用時，才把 `references/methods.md` 裡對應方法的 R 程式碼依使用者的欄位名稱改好，交給使用者在 R／RStudio 執行並貼回輸出；**只能用 `methods.md` 的程式碼，不可以自己另外寫統計程式**（例如改用 Wald 信賴區間），貼回之前也不可以自己算數字。
 
 需要的 R 套件：`jsonlite readr readxl ggplot2 scales PropCIs`（`Rscript scripts/install_packages.R` 可一次安裝）。Python 版需要 `pandas`、`matplotlib`、`scipy`。
 
