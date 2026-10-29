@@ -4,7 +4,7 @@
 
 **資料總覽 → 問使用者想問什麼 → 依問題畫圖 → 對照注意事項清單判斷適不適合（✅／⚠️／❌），等使用者 OK → R 計算 → 白話解釋並存成報告**
 
-所有數字都由 skill 內的程式計算，Claude 不可以自己算或修改數字。「資料適不適合用這個方法」依據我們整理的**注意事項清單**（`references/checklist.md`）：統計人看到資料時會先停下來想一想的 16 個狀況，其中 9 條是第一版的核心 guardrails。
+所有數字都由 skill 內的程式計算，Claude 不可以自己算或修改數字。「資料適不適合用這個方法」依據我們整理的**注意事項清單**（`references/checklist.md`）：統計人看到資料時會先停下來想一想的狀況，其中最重要的整理成核心規則（guardrails）。
 方法依據 Agresti《An Introduction to Categorical Data Analysis》第 3 版第 1–2 章。
 本 skill 是類別資料分析期中報告的 Part 1（關聯分析）；Part 2（類別模型）、Part 3（相關資料）是組員各自的 skill。
 
@@ -38,7 +38,7 @@
 categorical-association/
 ├── SKILL.md                     總流程：範圍、兩種執行模式、五個階段、輸出用語規則
 ├── references/
-│   ├── checklist.md             注意事項清單：16 條狀況、MVP 9 條 guardrails（階段 3 判斷用）
+│   ├── checklist.md             注意事項清單與核心規則（階段 3 判斷用）
 │   ├── decision-tree.md         依變數型態與資料結構選方法
 │   ├── methods.md               各方法速查＋可以自己執行的 R 程式碼
 │   └── textbook-methods.md      教科書的公式、節號、警告代碼

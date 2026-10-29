@@ -5107,11 +5107,8 @@ z-index: 1000;
   <ul>
   <li><a href="#要解決什麼問題" id="toc-要解決什麼問題" class="nav-link active" data-scroll-target="#要解決什麼問題">要解決什麼問題？</a></li>
   <li><a href="#skill-是什麼" id="toc-skill-是什麼" class="nav-link" data-scroll-target="#skill-是什麼">Skill 是什麼？</a></li>
-  <li><a href="#怎麼運作五個階段兩次停下來" id="toc-怎麼運作五個階段兩次停下來" class="nav-link" data-scroll-target="#怎麼運作五個階段兩次停下來">怎麼運作？五個階段、兩次停下來</a></li>
-  <li><a href="#給-skill-的知識注意事項清單" id="toc-給-skill-的知識注意事項清單" class="nav-link" data-scroll-target="#給-skill-的知識注意事項清單">給 Skill 的知識：注意事項清單</a>
-  <ul class="collapse">
-  <li><a href="#它怎麼提醒使用者不能亂做" id="toc-它怎麼提醒使用者不能亂做" class="nav-link" data-scroll-target="#它怎麼提醒使用者不能亂做">它怎麼提醒使用者不能亂做</a></li>
-  </ul></li>
+  <li><a href="#怎麼運作" id="toc-怎麼運作" class="nav-link" data-scroll-target="#怎麼運作">怎麼運作？</a></li>
+  <li><a href="#給-skill-的知識注意事項清單" id="toc-給-skill-的知識注意事項清單" class="nav-link" data-scroll-target="#給-skill-的知識注意事項清單">給 Skill 的知識：注意事項清單</a></li>
   <li><a href="#怎麼用" id="toc-怎麼用" class="nav-link" data-scroll-target="#怎麼用">怎麼用？</a>
   <ul class="collapse">
   <li><a href="#安裝" id="toc-安裝" class="nav-link" data-scroll-target="#安裝">安裝</a></li>
@@ -5166,13 +5163,13 @@ z-index: 1000;
 </div>
 <section id="要解決什麼問題" class="level2">
 <h2 class="anchored" data-anchor-id="要解決什麼問題">要解決什麼問題？</h2>
-<p>拿到一份資料、想知道「A 和 B 有沒有關係」，真正困難的不是按下卡方檢定，而是<strong>前面的判斷</strong>：</p>
+<p>選方法的決策樹看起來簡單，但真正難的是<strong>每一步的判斷</strong>：</p>
 <ul>
 <li>這個變數是名目還是有序？數字 1–4 是代碼還是分數？</li>
 <li>每一列彼此獨立嗎？同一個人有沒有出現兩次？</li>
 <li>樣本夠不夠大？要不要控制別的變數？</li>
 </ul>
-<p>直接問一般的 AI，它常常<strong>直接套卡方、自己心算數字</strong>，而且不會提醒限制。</p>
+<p>直接問一般的 AI，它通常會<strong>直接套卡方、自己算檢定</strong>，也不會提醒限制。</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -5183,7 +5180,7 @@ z-index: 1000;
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>讓 Claude 像修過類別資料分析的助教：<strong>先看資料、判斷能不能用、和使用者確認，再用程式算，最後用白話解釋並提醒限制</strong>。範圍是「兩個類別變數有沒有關聯」。</p>
+<p>讓 Claude 像這門課的助教：<strong>先看資料、判斷能不能用、和使用者確認，再用程式算，最後用白話解釋並提醒限制</strong>。範圍是「兩個類別變數有沒有關聯」。</p>
 </div>
 </div>
 </section>
@@ -5222,8 +5219,8 @@ z-index: 1000;
 </table>
 <p>手冊最上面有一段簡短的介紹，Claude 就是看這段來決定「這個問題該不該用這個 Skill」。</p>
 </section>
-<section id="怎麼運作五個階段兩次停下來" class="level2">
-<h2 class="anchored" data-anchor-id="怎麼運作五個階段兩次停下來">怎麼運作？五個階段、兩次停下來</h2>
+<section id="怎麼運作" class="level2">
+<h2 class="anchored" data-anchor-id="怎麼運作">怎麼運作？</h2>
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -5259,40 +5256,7 @@ z-index: 1000;
 <li>❌ <strong>不適合使用</strong>（說明原因，建議其他方法或轉介）</li>
 </ul>
 <p>清單上沒有的狀況，Skill 不可以自己發明標準。</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>類別</th>
-<th>條數</th>
-<th>例子</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>A. Skill 可以自動從資料檢查</td>
-<td>7</td>
-<td>期望次數太小、有 0 次數的格子、缺失值、分層後各層方向不一致</td>
-</tr>
-<tr class="even">
-<td>B. 一定要問使用者</td>
-<td>6</td>
-<td>同一個人測了兩次、數字代碼有沒有順序、研究設計、第三個變數的角色</td>
-</tr>
-<tr class="odd">
-<td>C. 解釋結果的提醒</td>
-<td>3</td>
-<td>P 值不等於關聯強弱、相關不等於因果、勝算比不是機率的倍數</td>
-</tr>
-</tbody>
-</table>
-<section id="它怎麼提醒使用者不能亂做" class="level3">
-<h3 class="anchored" data-anchor-id="它怎麼提醒使用者不能亂做">它怎麼提醒使用者不能亂做</h3>
-<p>第一版真正會擋下來或標示的是下面 <strong>9 條核心規則</strong>，其他的只做文字提醒，避免第一版太複雜：</p>
+<p>清單裡最重要的是下面這些<strong>核心規則</strong>：碰到這些狀況，Skill 會停下來問、標 ⚠️ 或 ❌，或改用比較適合的方法；其他狀況只在報告裡加一句提醒。</p>
 <div class="columns rules">
 <div class="column" style="width:31%;">
 <p><strong>分析前一定問使用者</strong></p>
@@ -5341,7 +5305,6 @@ z-index: 1000;
 </div>
 </div>
 </div>
-</section>
 </section>
 <section id="怎麼用" class="level2">
 <h2 class="anchored" data-anchor-id="怎麼用">怎麼用？</h2>
@@ -5403,164 +5366,11 @@ z-index: 1000;
 <section id="示範同一份資料一題可以一題不行" class="level3">
 <h3 class="anchored" data-anchor-id="示範同一份資料一題可以一題不行">示範：同一份資料，一題可以、一題不行</h3>
 <p>資料：<code>student-por.csv</code>，UCI 公開的葡萄牙高中生資料（Cortez, 2008；CC BY 4.0）：649 位學生、一人一列、33 欄，包括學校、性別、住在都市或鄉下、家裡有沒有網路、平日和週末的喝酒程度、想不想讀大學、三次成績等。</p>
-<p>第 1 步的總表就出現提醒：</p>
+<p>用這份資料問兩個問題，要貼給 Claude 的話在上面「跟著做」：</p>
 <ul>
-<li>649 列、33 欄</li>
-<li>看起來是<strong>一列一筆紀錄</strong>的原始資料（不是次數表）</li>
-<li>需要確認：Mjob、Fjob 是不是「同一個人」在不同時間或不同題目的回答（配對資料）？還是只是剛好用相同選項的不同變數？</li>
+<li>✅「住在都市或鄉下，和家裡有沒有網路有關嗎？」：兩個不同的變數、每一列是不同的學生，可以用列聯表與卡方檢定。</li>
+<li>❌「學生平日和週末的喝酒程度一樣嗎？」：<code>Dalc</code>（平日）和 <code>Walc</code>（週末）是同一個學生的兩個回答，屬於配對資料，不能用卡方。</li>
 </ul>
-<p>媽媽和爸爸的工作（<code>Mjob</code>、<code>Fjob</code>）選項完全相同，資料看不出它們是不是同一個人的兩次回答，所以 Skill 先問人。</p>
-<p><strong>✅ 問「住在都市或鄉下，和家裡有沒有網路有關嗎？」</strong></p>
-<ol type="1">
-<li><p>用到的是 <code>address</code> 和 <code>internet</code> 兩個不同的變數，每一列是不同的學生；期望次數都夠大，卡方標 ✅。它仍會停下來問「每一列是不是不同的學生」「成功指哪一類」，等使用者確認。</p></li>
-<li><p>第 2 步畫出住家與網路的關係圖：</p>
-<p><img role="img" src="data:image/png;base64,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" class="img-fluid" style="width:70.0%"></p></li>
-<li><p>第 4–5 步：家裡有網路的比例，都市 81.6%、鄉下 65.5%；X² = 20.06；相對風險 1.25、勝算比 2.34，並提醒勝算比是「勝算」的倍數，不是機率的倍數。</p></li>
-</ol>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">注记</span>R 自動產生的報告檔（點開查看）
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-4" class="callout-4-contents callout-collapse collapse">
-<section id="分析報告住在都市或鄉下和家裡有沒有網路有關嗎" class="level4 callout-body-container callout-body">
-<h4 class="anchored" data-anchor-id="分析報告住在都市或鄉下和家裡有沒有網路有關嗎">分析報告：住在都市或鄉下，和家裡有沒有網路有關嗎？</h4>
-<ul>
-<li>資料檔：<code>student-por.csv</code></li>
-<li>方法：列聯表分析：卡方獨立性檢定（chi-squared test of independence）</li>
-<li>資料結構：independent</li>
-<li>選擇理由：兩個不同的二元變數、每一列是不同的學生，用列聯表與卡方檢定</li>
-</ul>
-<section id="次數表" class="level5">
-<h5 class="anchored" data-anchor-id="次數表">次數表</h5>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th></th>
-<th>yes</th>
-<th>no</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>U</td>
-<td>369</td>
-<td>83</td>
-</tr>
-<tr class="even">
-<td>R</td>
-<td>129</td>
-<td>68</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="結果" class="level5">
-<h5 class="anchored" data-anchor-id="結果">結果</h5>
-<ul>
-<li>樣本數 n = 649；address 有 2 類，internet 有 2 類。</li>
-<li>Pearson 卡方 X² = 20.06（df = 1），P = &lt; 0.001；概似比 G² = 19.16。</li>
-<li>獨立假設下的期望次數最小為 45.84；小於 5 的格子 0 / 4。</li>
-<li>Fisher 精確檢定雙尾 P = &lt; 0.001。</li>
-<li>2×2 表四格的標準化殘差絕對值相同，以其中一格為代表：address=U、internet=yes（4.48，實際次數比獨立時預期的多）。</li>
-<li>internet=yes 的比例：U 組為 0.816（369/452），R 組為 0.655（129/197）。</li>
-<li>比例差（U − R）= 0.1615，95% CI [0.0881, 0.2384]。</li>
-<li>相對風險 RR（U / R）= 1.25，95% CI [1.12, 1.40]。</li>
-<li>勝算比 OR（U 相對於 R，internet=yes 的勝算）= 2.34，95% CI [1.61, 3.42]。</li>
-</ul>
-</section>
-<section id="檢定" class="level5">
-<h5 class="anchored" data-anchor-id="檢定">檢定</h5>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>test</th>
-<th>statistic</th>
-<th>df</th>
-<th>p_value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Pearson X2</td>
-<td>20.0564</td>
-<td>1.0000</td>
-<td>7.519e-06</td>
-</tr>
-<tr class="even">
-<td>Likelihood-ratio G2</td>
-<td>19.1646</td>
-<td>1.0000</td>
-<td>1.199e-05</td>
-</tr>
-<tr class="odd">
-<td>Fisher exact (two-sided)</td>
-<td>—</td>
-<td>—</td>
-<td>1.265e-05</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="效果量與信賴區間" class="level5">
-<h5 class="anchored" data-anchor-id="效果量與信賴區間">效果量與信賴區間</h5>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>measure</th>
-<th>estimate</th>
-<th>lower</th>
-<th>upper</th>
-<th>ci_method</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>difference of proportions</td>
-<td>0.1615</td>
-<td>0.0881</td>
-<td>0.2384</td>
-<td>score</td>
-</tr>
-<tr class="even">
-<td>relative risk</td>
-<td>1.2467</td>
-<td>1.1243</td>
-<td>1.4032</td>
-<td>score</td>
-</tr>
-<tr class="odd">
-<td>odds ratio</td>
-<td>2.3435</td>
-<td>1.6056</td>
-<td>3.4206</td>
-<td>score</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="注意事項" class="level5">
-<h5 class="anchored" data-anchor-id="注意事項">注意事項</h5>
-<ul>
-<li>比例不算小，勝算比不能當成相對風險來解釋（「幾倍的機率」要看 RR）。</li>
-</ul>
-</section>
-<section id="圖" class="level5">
-<h5 class="anchored" data-anchor-id="圖">圖</h5>
-<blockquote class="blockquote">
-<p>卡方檢定只回答「有沒有證據顯示有關聯」，不代表關聯有多強；強度要看比例、勝算比與殘差。</p>
-</blockquote>
-</section>
-</section>
-</div>
-</div>
-<p><strong>❌ 問「學生平日和週末的喝酒程度一樣嗎？」</strong></p>
-<p>這題比的是 <code>Dalc</code>（平日）和 <code>Walc</code>（週末），也就是<strong>同一個學生的兩個回答</strong>。依清單第 8 條，卡方標 ❌：同一個人的兩次回答彼此相關，不符合獨立的假設。Skill 不會給出卡方的結果，而是說明這是配對資料，要改用配對資料的方法（例如 McNemar 檢定或邊際同質性檢定）。</p>
 <p>同一份資料，問題不同，判斷就不同：Skill 看的不是檔案本身，而是<strong>問題用到哪些欄位、這些欄位之間是什麼關係</strong>。</p>
 </section>
 </section>
@@ -5568,7 +5378,7 @@ z-index: 1000;
 <h2 class="anchored" data-anchor-id="合不合理">合不合理？</h2>
 <p>所有數字都由程式計算。我們拿參考書籍（Agresti, 2019）裡的例子讓 Skill 計算，<strong>算出來的數字都和書中的答案一致</strong>。</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -5577,7 +5387,7 @@ z-index: 1000;
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>整個 Skill 是和 Claude Code 一起開發的，每一步都記錄在 <code>dev/ai-log/log.csv</code>。</p>
 <table class="caption-top table">
@@ -5630,7 +5440,7 @@ z-index: 1000;
 <td>知識</td>
 <td>老師要 Skill 有我們的知識</td>
 <td>依組員訂的主題起草注意事項</td>
-<td><strong>組員逐條修正規則</strong>，訂出 MVP 9 條</td>
+<td><strong>組員逐條修正規則</strong>，訂出核心規則</td>
 </tr>
 <tr class="odd">
 <td>網頁版</td>
