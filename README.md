@@ -46,6 +46,8 @@ categorical-association/
 │   ├── profile_data.R / .py     階段 1：資料總覽、判斷變數型態與資料結構
 │   ├── describe_question.R / .py 階段 2：依問題畫圖、算判斷要用的數字
 │   ├── run_analysis.R / .py     階段 4：計算、畫圖、產生報告
+│   ├── make_qmd.R / .py         階段 5 之後（可選）：產生可重現的 qmd 分析檔
+│   ├── qmd/                     qmd 分析檔的範本片段（R 版與 Python 版共用）
 │   ├── cda_describe.py          Python 版：讀資料、總表、畫圖（網頁版用）
 │   ├── cda_engine.py            Python 版的計算引擎（網頁版用，對照 R/association.R 改寫）
 │   ├── load_engine.R            載入計算引擎
@@ -86,6 +88,7 @@ claude.ai 網頁版：在「設定 → 功能」開啟程式碼執行，再到�
 | `result.json` | 所有數字（給程式讀） |
 | `spec.json` | 這次的判斷紀錄：問題、變數型態、資料結構、方法與理由 |
 | `reproduce.R`（網頁版為 `reproduce.py`） | 自己重跑這次分析的程式碼 |
+| `分析_<資料>_<方法>.qmd` | 可選，分析結束後問使用者要不要才產生：分析設定、R 程式碼、檢定、效果量、圖與 Claude 寫的結論；只需要 CRAN 套件，和資料檔放在同一個資料夾，用 RStudio 按 Render 就會重算一次 |
 
 ## 示範資料
 
@@ -131,8 +134,8 @@ Rscript -e "testthat::test_dir('dev/tests')"
 
 - `dev/tests/test-association.R`：用教科書的例子（政黨×性別、阿斯匹靈、品茶、飲酒與畸形、死刑判決）檢查每個數字都和課本一致
 - `dev/tests/test-association.R` 也檢查注意事項清單的規則：Cochran 準則、0 cell 與空類別、缺失比例、各層方向不一致、小組人數提醒、兩種趨勢檢定的命名與拒絕條件
-- `dev/tests/test-skill.R`：資料判斷、recode、階段 1–4 的程式端對端、模式 2 的 R 程式碼和引擎結果一致、不支援的分析會拒絕、示範資料的預期結果（`Mjob`／`Fjob` 要被偵測為可能的配對資料），以及用 R 內建資料（`Titanic`、`UCBAdmissions`、MASS 的 `housing`）測次數表、趨勢與分層分析（另用 R 內建函式重算）
-- `dev/tests/test-python.R`：Python 版和 R 版逐項比對：第 1–2 步的總表與檢查數字（11 份資料、9 個問題），以及第 4 步 16 個分析案例的 `result.json` 與報告檔（沒有 Python 時自動略過）
+- `dev/tests/test-skill.R`：資料判斷、recode、階段 1–4 的程式端對端、模式 2 的 R 程式碼和引擎結果一致、qmd 分析檔裡的 R 程式碼單獨執行也得到相同的數字、不支援的分析會拒絕、示範資料的預期結果（`Mjob`／`Fjob` 要被偵測為可能的配對資料），以及用 R 內建資料（`Titanic`、`UCBAdmissions`、MASS 的 `housing`）測次數表、趨勢與分層分析（另用 R 內建函式重算）
+- `dev/tests/test-python.R`：Python 版和 R 版逐項比對：第 1–2 步的總表與檢查數字（11 份資料、9 個問題），以及第 4 步 16 個分析案例的 `result.json`、報告檔與 qmd 分析檔（沒有 Python 時自動略過）
 
 沒有下載課本資料時，用到這些資料的測試會自動略過。
 

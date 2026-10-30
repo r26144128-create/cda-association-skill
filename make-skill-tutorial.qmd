@@ -85,6 +85,7 @@ flowchart LR
     P3 --> STOP{{停：等使用者 OK}}
     STOP --> P4[4 程式計算<br/>畫圖、報告]
     P4 --> P5[5 白話解釋]
+    P5 -.-> QMD[可選：產生<br/>qmd 分析檔]
 ```
 
 三個設計重點：
@@ -175,6 +176,12 @@ flowchart LR
    每一列是不同的學生；成功 = yes（有網路）；不控制學校，只看這兩個變數；是橫斷調查，可以；用推薦的
    ```
 
+4. 它問要不要產生 qmd 分析檔時貼上：
+
+   ```{.default}
+   要
+   ```
+
 #### ❌ 平日 vs 週末喝酒
 
 1. 在 ✅ 那題的**同一個對話**接著貼上（新對話的話，先上傳資料、貼「請用 categorical-association 分析這份資料」）：
@@ -209,6 +216,12 @@ flowchart LR
    每一列是不同的學生；成功 = yes（想讀大學）；用推薦的
    ```
 
+4. 它問要不要產生 qmd 分析檔時貼上：
+
+   ```{.default}
+   要
+   ```
+
 #### 練習：讀書時間
 
 1. 上傳資料後貼上：
@@ -227,6 +240,12 @@ flowchart LR
 
    ```{.default}
    studytime 是有序的：1 < 2 < 3 < 4（數字越大讀越久）；每一列是不同的學生；成功 = yes；用推薦的
+   ```
+
+4. 它問要不要產生 qmd 分析檔時貼上：
+
+   ```{.default}
+   要
    ```
 
 :::
@@ -251,6 +270,7 @@ t_ok <- run_skill(list(question = "住在都市或鄉下，和家裡有沒有網
                        analysis = "crosstab", x = "address", y = "internet", success = "yes", design = "cross-sectional",
                        levels = list(address = c("U", "R"), internet = c("yes", "no"))),
                   demo_csv, out = d_ok)
+run_script("make_qmd.R", c(demo_csv, d_ok))
 es <- function(m) t_ok$json$estimates$estimate[t_ok$json$estimates$measure == m]
 st <- function(t) t_ok$json$tests$statistic[t_ok$json$tests$test == t]
 ```

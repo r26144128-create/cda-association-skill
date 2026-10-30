@@ -1,0 +1,11 @@
+
+## 圖
+
+```{r}
+ggplot(as.data.frame(prop.table(tab3, c(1, 3))), aes(x = .data[[{{x_q}}]], y = Freq, fill = .data[[{{y_q}}]])) +
+  geom_col() +
+  facet_wrap(vars(.data[[{{z_q}}]])) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(y = "比例") +
+  theme_minimal()
+```

@@ -1,0 +1,42 @@
+
+## 分層次數表
+
+```{r}
+tab3 <- xtabs({{formula}}, data = df)
+s <- {{success}}                       # 「成功」的類別，放在第 1 欄
+tab3 <- tab3[, c(s, setdiff(colnames(tab3), s)), , drop = FALSE]
+ftable(tab3, row.vars = c(3, 1))
+```
+
+## 各層與合併的勝算比（Agresti §2.7）
+
+```{r}
+or_row <- function(t, label) {
+  ci <- PropCIs::orscoreci(t[1, 1], sum(t[1, ]), t[2, 1], sum(t[2, ]), conf.level = {{conf}})$conf.int
+  data.frame(層 = label, n = sum(t), p1 = t[1, 1] / sum(t[1, ]), p2 = t[2, 1] / sum(t[2, ]),
+             勝算比 = (t[1, 1] * t[2, 2]) / (t[1, 2] * t[2, 1]), 下限 = ci[1], 上限 = ci[2])
+}
+rbind(do.call(rbind, lapply(dimnames(tab3)[[3]], function(k) or_row(tab3[, , k], k))),
+      or_row(margin.table(tab3, c(1, 2)), "合併（忽略控制變數）"))
+```
+
+## 共同勝算比、CMH 與同質性檢定（Agresti §4.3.4）
+
+```{r}
+xl <- dimnames(tab3)[[1]]; zl <- dimnames(tab3)[[3]]
+g <- expand.grid(x = xl, z = zl, stringsAsFactors = FALSE)
+g$succ <- tab3[cbind(g$x, colnames(tab3)[1], g$z)]
+g$fail <- tab3[cbind(g$x, colnames(tab3)[2], g$z)]
+g$x <- relevel(factor(g$x, levels = xl), ref = xl[2])   # exp(β)：第 1 組相對於第 2 組
+g$z <- factor(g$z, levels = zl)
+fit <- glm(cbind(succ, fail) ~ x + z, family = binomial, data = g)
+fit0 <- glm(cbind(succ, fail) ~ z, family = binomial, data = g)
+b <- paste0("x", xl[1])
+c(共同勝算比 = exp(coef(fit)[[b]]),
+  exp(suppressMessages(confint(fit, b, level = {{conf}}))))   # profile likelihood 信賴區間
+LR <- fit0$deviance - fit$deviance
+c(LR = LR, df = 1, p = pchisq(LR, 1, lower.tail = FALSE))      # 條件獨立的概似比檢定
+mantelhaen.test(tab3, correct = FALSE)                          # CMH 檢定
+c(deviance = fit$deviance, df = fit$df.residual,                # 同質關聯檢定（§5.2.1）
+  p = pchisq(fit$deviance, fit$df.residual, lower.tail = FALSE))
+```

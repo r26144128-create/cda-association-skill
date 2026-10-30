@@ -1,0 +1,29 @@
+
+## 次數表
+
+```{r}
+tab <- xtabs({{formula}}, data = df)   # 列 = 解釋變數 X，欄 = 結果變數 Y
+addmargins(tab)
+round(prop.table(tab, 1), 4)           # 各組（列）的條件比例
+```
+
+## {{trend_name}}（Agresti §2.5）
+
+M² = (n − 1)R²，df = 1；只檢定線性趨勢。
+
+```{r}
+u <- {{u}}                             # {{x}} 各類的分數（依順序）
+v <- {{v}}
+m2 <- function(tab, u, v) {
+  p <- tab / sum(tab)
+  pr <- rowSums(p); pc <- colSums(p)
+  ubar <- sum(u * pr); vbar <- sum(v * pc)
+  R <- sum(outer(u - ubar, v - vbar) * p) / sqrt(sum((u - ubar)^2 * pr) * sum((v - vbar)^2 * pc))
+  M2 <- (sum(tab) - 1) * R^2
+  c(R = R, M2 = M2, df = 1, p = pchisq(M2, 1, lower.tail = FALSE))
+}
+res <- m2(tab, u, v)
+res
+c(M = sign(res[["R"]]) * sqrt(res[["M2"]]), 單尾P = pnorm(-sqrt(res[["M2"]])))
+chisq.test(tab, correct = FALSE)       # 對照：忽略順序的卡方檢定
+```

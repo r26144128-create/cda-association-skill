@@ -1,0 +1,43 @@
+---
+title: "{{title}}"
+lang: zh-Hant
+format:
+  html:
+    toc: true
+    embed-resources: true
+execute:
+  warning: false
+---
+
+本檔由 categorical-association Skill 產生。「結論與解釋」是 Claude 依分析結果寫的文字；其餘的數字都由下面的 R 程式碼重新計算，和 Skill 的分析報告相同。
+
+**使用方式**：把這個檔案和資料檔 `{{data_file}}` 放在同一個資料夾，用 RStudio 開啟後按 **Render**。第一次使用先安裝套件：`install.packages(c("readr", "readxl", "ggplot2", "scales", "PropCIs"))`。
+
+## 結論與解釋
+
+<!-- 結論與解釋：由 Claude 依階段 5 填入 -->
+
+## 分析設定
+
+| 項目 | 內容 |
+|---|---|
+{{settings}}
+
+## 讀取資料
+
+```{r}
+library(ggplot2)
+data_file <- {{data_file_q}}   # 資料檔名：檔名不一樣時改這一行
+{{read_code}}
+```
+{{recode_block}}
+```{r}
+# 類別順序（沒有指定的變數依代碼排序）
+{{factor_code}}
+# 排除分析變數有缺失的列（有缺失一律報告；≥ 5% 要提醒）
+vars <- {{vars}}
+miss <- !complete.cases(df[{{miss_cols}}])
+{{missing_code}}
+df <- df[!miss, ]{{zero_code}}
+df[vars] <- droplevels(df[vars])   # 沒有觀察值的類別從分析中移除
+```

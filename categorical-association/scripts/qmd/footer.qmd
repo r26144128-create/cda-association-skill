@@ -1,0 +1,9 @@
+{{warnings_block}}
+> {{reminder}}
+
+## 參考文獻
+
+- Agresti, A. (2019). *An Introduction to Categorical Data Analysis* (3rd ed.). Wiley.
+- R Core Team. *R: A Language and Environment for Statistical Computing*. R Foundation for Statistical Computing. <https://www.R-project.org/>
+- Scherer, R. *PropCIs: Various Confidence Interval Methods for Proportions*. R package. <https://CRAN.R-project.org/package=PropCIs>
+- Wickham, H. *ggplot2: Elegant Graphics for Data Analysis*. Springer. <https://ggplot2.tidyverse.org/>

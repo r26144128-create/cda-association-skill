@@ -1,0 +1,11 @@
+
+## Fisher 精確檢定（Agresti §2.6）
+
+期望次數太小，卡方的大樣本近似可能不可靠（Cochran 準則，§2.4.7），以 Fisher 精確檢定為主。
+
+```{r}
+set.seed(20261030)
+# 表太大算不出精確值時，改用模擬的 P 值
+tryCatch(fisher.test(tab, workspace = 2e7),
+         error = function(e) fisher.test(tab, simulate.p.value = TRUE, B = 1e5))
+```

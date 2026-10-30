@@ -1,0 +1,116 @@
+---
+title: "分析報告：住在都市或鄉下，和家裡有沒有網路有關嗎？"
+lang: zh-Hant
+format:
+  html:
+    toc: true
+    embed-resources: true
+execute:
+  warning: false
+---
+
+本檔由 categorical-association Skill 產生。「結論與解釋」是 Claude 依分析結果寫的文字；其餘的數字都由下面的 R 程式碼重新計算，和 Skill 的分析報告相同。
+
+**使用方式**：把這個檔案和資料檔 `student-por.csv` 放在同一個資料夾，用 RStudio 開啟後按 **Render**。第一次使用先安裝套件：`install.packages(c("readr", "readxl", "ggplot2", "scales", "PropCIs"))`。
+
+## 結論與解釋
+
+<!-- 結論與解釋：由 Claude 依階段 5 填入 -->
+
+## 分析設定
+
+| 項目 | 內容 |
+|---|---|
+| 問題 | 住在都市或鄉下，和家裡有沒有網路有關嗎？ |
+| 資料檔 | `student-por.csv` |
+| 方法 | 列聯表分析：卡方獨立性檢定（chi-squared test of independence）（Agresti §2.1–2.4, §2.6） |
+| 選擇理由 | 兩個不同的二元變數、每一列是不同的學生，用列聯表與卡方檢定 |
+| 變數 | 解釋變數 X：address；結果變數 Y：internet |
+| 變數型態 | address：binary；internet：binary |
+| 資料結構 | independent |
+| 研究設計 | cross-sectional |
+
+## 讀取資料
+
+```{r}
+library(ggplot2)
+data_file <- "student-por.csv"   # 資料檔名：檔名不一樣時改這一行
+df <- as.data.frame(readr::read_delim(data_file, delim = ";",
+  locale = readr::locale(encoding = "UTF-8"), show_col_types = FALSE))
+```
+
+```{r}
+# 類別順序（沒有指定的變數依代碼排序）
+df[["address"]] <- factor(df[["address"]], levels = c("U", "R"))
+df[["internet"]] <- factor(df[["internet"]], levels = c("yes", "no"))
+# 排除分析變數有缺失的列（有缺失一律報告；≥ 5% 要提醒）
+vars <- c("address", "internet")
+miss <- !complete.cases(df[vars])
+c(排除筆數 = sum(miss), 比例 = mean(miss))
+df <- df[!miss, ]
+df[vars] <- droplevels(df[vars])   # 沒有觀察值的類別從分析中移除
+```
+
+## 次數表
+
+```{r}
+tab <- xtabs(~ `address` + `internet`, data = df)   # 列 = 解釋變數 X，欄 = 結果變數 Y
+addmargins(tab)
+round(prop.table(tab, 1), 4)           # 各組（列）的條件比例
+```
+
+## 卡方檢定（Agresti §2.4）
+
+```{r}
+ct <- chisq.test(tab, correct = FALSE)
+ct                                     # Pearson X²
+G2 <- 2 * sum(ifelse(tab > 0, tab * log(tab / ct$expected), 0))
+c(G2 = G2, df = unname(ct$parameter), p = pchisq(G2, ct$parameter, lower.tail = FALSE))
+round(ct$expected, 2)                  # 期望次數
+c(最小期望次數 = min(ct$expected), 小於5的格數 = sum(ct$expected < 5))
+round(ct$stdres, 2)                    # 標準化殘差：|r| > 2 的格子明顯偏離獨立（§2.4.5）
+```
+
+## Fisher 精確檢定（Agresti §2.6）
+
+```{r}
+fisher.test(tab)                       # 雙尾
+```
+
+## 效果量與 score 信賴區間（Agresti §2.2–2.3）
+
+```{r}
+s <- "yes"                       # 「成功」的類別
+y1 <- tab[1, s]; n1 <- sum(tab[1, ])
+y2 <- tab[2, s]; n2 <- sum(tab[2, ])
+p1 <- y1 / n1; p2 <- y2 / n2
+ci <- rbind(PropCIs::diffscoreci(y1, n1, y2, n2, conf.level = 0.95)$conf.int,
+            PropCIs::riskscoreci(y1, n1, y2, n2, conf.level = 0.95)$conf.int,
+            PropCIs::orscoreci(y1, n1, y2, n2, conf.level = 0.95)$conf.int)
+data.frame(量數 = c("比例差", "相對風險", "勝算比"),
+           估計值 = c(p1 - p2, p1 / p2, (y1 * (n2 - y2)) / ((n1 - y1) * y2)),
+           下限 = ci[, 1], 上限 = ci[, 2])
+```
+
+## 圖
+
+```{r}
+ggplot(as.data.frame(prop.table(tab, 1)), aes(x = .data[["address"]], y = Freq, fill = .data[["internet"]])) +
+  geom_col() +
+  scale_y_continuous(labels = scales::percent) +
+  labs(y = "比例") +
+  theme_minimal()
+```
+
+## 注意事項
+
+- 比例不算小，勝算比不能當成相對風險來解釋（「幾倍的機率」要看 RR）。（Agresti §2.3.4）
+
+> 卡方檢定只回答「有沒有證據顯示有關聯」，不代表關聯有多強；強度要看比例、勝算比與殘差（§2.4.7）。
+
+## 參考文獻
+
+- Agresti, A. (2019). *An Introduction to Categorical Data Analysis* (3rd ed.). Wiley.
+- R Core Team. *R: A Language and Environment for Statistical Computing*. R Foundation for Statistical Computing. <https://www.R-project.org/>
+- Scherer, R. *PropCIs: Various Confidence Interval Methods for Proportions*. R package. <https://CRAN.R-project.org/package=PropCIs>
+- Wickham, H. *ggplot2: Elegant Graphics for Data Analysis*. Springer. <https://ggplot2.tidyverse.org/>

@@ -228,6 +228,92 @@ test_that("Berkeley gender × admission by department: stratified analysis", {
   expect_equal(stat_of(r$json, "Homogeneous association (residual deviance)"), 20.204, tolerance = 1e-4)
 })
 
+# ---- End of stage 5: the qmd file runs on its own and gives the engine's numbers ----
+
+run_qmd <- function(spec, data = student_file) {
+  r <- run_skill(spec, data)
+  system2("Rscript", c(shQuote(file.path(skill, "scripts", "make_qmd.R")), shQuote(data), shQuote(r$dir)),
+          stdout = FALSE, stderr = FALSE)
+  qmd <- list.files(r$dir, pattern = "\\.qmd$", full.names = TRUE)
+  work <- tempfile("qmd-run-")
+  dir.create(work)
+  # the qmd reads the data next to itself, under the name without claude.ai's upload code
+  file.copy(data, file.path(work, sub("^[0-9a-f]{8}-", "", basename(data))))
+  code <- file.path(work, "code.R")
+  knitr::purl(qmd, code, documentation = 0, quiet = TRUE)
+  env <- new.env()
+  old <- setwd(work)
+  on.exit(setwd(old))
+  suppressWarnings(sys.source(code, envir = env))          # sparse tables warn, as in the rendered file
+  list(json = r$json, env = env, qmd = readLines(qmd, encoding = "UTF-8"))
+}
+est_of <- function(json) setNames(json$estimates$estimate, json$estimates$measure)
+
+test_that("make_qmd.R: crosstab qmd (with recode) reproduces X², G² and the score intervals", {
+  out <- run_qmd(list(analysis = "crosstab", x = "romantic", y = "passed", success = "pass", design = "cross-sectional",
+                      recode = list(passed = list(from = "G3", breaks = 10, labels = c("fail", "pass"))),
+                      levels = list(romantic = c("yes", "no"), passed = c("pass", "fail"))))
+  expect_equal(unname(out$env$ct$statistic), stat_of(out$json, "Pearson X2"), tolerance = 1e-8)
+  expect_equal(out$env$G2, stat_of(out$json, "Likelihood-ratio G2"), tolerance = 1e-8)
+  est <- out$json$estimates
+  expect_equal(unname(out$env$ci[, 1]), est$lower, tolerance = 1e-8)
+  expect_equal(unname(out$env$ci[, 2]), est$upper, tolerance = 1e-8)
+  expect_true(any(grepl("<!-- 結論與解釋", out$qmd, fixed = TRUE)))   # Claude fills this in
+})
+
+test_that("make_qmd.R: a file uploaded to claude.ai is read under its original name", {
+  uploaded <- file.path(tempdir(), "ccd840c3-student-por.csv")
+  file.copy(file.path(root, "example_data", "student-por.csv"), uploaded, overwrite = TRUE)
+  out <- run_qmd(list(analysis = "crosstab", x = "address", y = "internet", success = "yes",
+                      levels = list(address = c("U", "R"), internet = c("yes", "no"))), data = uploaded)
+  expect_true(any(out$qmd == 'data_file <- "student-por.csv"   # 資料檔名：檔名不一樣時改這一行'))
+  expect_false(any(grepl("ccd840c3", out$qmd)))
+  expect_equal(unname(out$env$ct$statistic), 20.0564, tolerance = 1e-5)
+})
+
+test_that("make_qmd.R: aggregated counts, case-control and a sparse table", {
+  out <- run_qmd(list(analysis = "crosstab", x = "Sex", y = "Survived", count = "Freq", success = "Yes",
+                      levels = list(Sex = c("Female", "Male"), Survived = c("Yes", "No"))), data = titanic_file)
+  expect_equal(unname(out$env$ct$statistic), stat_of(out$json, "Pearson X2"), tolerance = 1e-8)
+  expect_equal(unname(out$env$ci[, 1]), out$json$estimates$lower, tolerance = 1e-8)
+  cc <- tmp_csv(data.frame(smoker = c("yes", "yes", "no", "no"), cancer = c("case", "control", "case", "control"),
+                           n = c(688, 650, 21, 59)))
+  out <- run_qmd(list(analysis = "crosstab", x = "smoker", y = "cancer", count = "n", design = "case-control"), data = cc)
+  expect_false(any(grepl("diffscoreci", out$qmd)))          # case-control: odds ratio only (§2.3.5)
+  expect_equal(unname(out$env$tab[1, 1]), 21)
+  sparse <- tmp_csv(data.frame(a = rep(c("p", "q", "r"), 3), b = rep(c("u", "v", "w"), each = 3),
+                               n = c(60, 60, 15, 60, 60, 15, 1, 2, 1)))
+  out <- run_qmd(list(analysis = "crosstab", x = "a", y = "b", count = "n"), data = sparse)
+  expect_true(any(grepl("workspace = 2e7", out$qmd, fixed = TRUE)))
+})
+
+test_that("make_qmd.R: trend qmd reproduces M² (Cochran–Armitage and linear-by-linear)", {
+  out <- run_qmd(list(analysis = "trend", x = "studytime", y = "pass", success = "pass",
+                      ordinal = list("studytime"), x_scores = c(1, 3.5, 7.5, 12),
+                      levels = list(studytime = c("1", "2", "3", "4"), pass = c("pass", "fail"))))
+  expect_equal(out$env$res[["M2"]], stat_of(out$json, "Cochran-Armitage trend (M2)"), tolerance = 1e-8)
+  expect_true(any(grepl("seq_len(nrow(tab))", out$qmd, fixed = TRUE)))   # sensitivity analysis
+  lv <- c("Low", "Medium", "High")
+  out <- run_qmd(list(analysis = "trend", x = "Infl", y = "Sat", count = "Freq", ordinal = list("Infl", "Sat"),
+                      levels = list(Infl = lv, Sat = lv)), data = housing_file)
+  expect_equal(out$env$res[["M2"]], stat_of(out$json, "Linear-by-linear association (M2)"), tolerance = 1e-8)
+})
+
+test_that("make_qmd.R: stratified qmd reproduces the odds ratios, LR, CMH and homogeneity tests", {
+  out <- run_qmd(list(analysis = "stratified", x = "Gender", y = "Admit", z = "Dept", count = "Freq",
+                      success = "Admitted", levels = list(Gender = c("Male", "Female"),
+                                                          Admit = c("Admitted", "Rejected"))),
+                 data = berkeley_file)
+  e <- out$env
+  expect_equal(exp(coef(e$fit)[[e$b]]), unname(est_of(out$json)["common odds ratio (logistic model)"]), tolerance = 1e-8)
+  expect_equal(e$LR, stat_of(out$json, "LR test of conditional independence (beta = 0)"), tolerance = 1e-8)
+  expect_equal(unname(mantelhaen.test(e$tab3, correct = FALSE)$statistic),
+               stat_of(out$json, "Cochran-Mantel-Haenszel (score test, beta = 0)"), tolerance = 1e-8)
+  expect_equal(e$fit$deviance, stat_of(out$json, "Homogeneous association (residual deviance)"), tolerance = 1e-8)
+  m <- margin.table(e$tab3, c(1, 2))
+  expect_equal((m[1, 1] * m[2, 2]) / (m[1, 2] * m[2, 1]), unname(est_of(out$json)["marginal odds ratio"]), tolerance = 1e-8)
+})
+
 # ---- Stages 1-2: overview table and question check ----
 
 test_that("profile_data.R writes the overview table; describe_question.R writes plots and facts", {

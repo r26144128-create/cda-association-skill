@@ -1,0 +1,6 @@
+
+## Fisher 精確檢定（Agresti §2.6）
+
+```{r}
+fisher.test(tab)                       # 雙尾
+```

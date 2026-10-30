@@ -133,6 +133,14 @@ test_that("stage 4: Python analysis matches R on crosstab, trend, stratified, ed
     expect_equal(p, r, tolerance = 1e-6, info = q[[2]])
     if (is.null(r$error)) {
       expect_identical(read_md(file.path(out$dir, "py")), read_md(file.path(out$dir, "r")), info = q[[2]])
+      # end of stage 5: both versions write the same qmd file
+      file.copy(q_file, file.path(out$dir, c("r", "py"), "spec.json"), overwrite = TRUE)
+      system2("Rscript", c(shQuote(file.path(scripts, "make_qmd.R")), shQuote(q[[1]]), shQuote(file.path(out$dir, "r"))),
+              stdout = FALSE, stderr = FALSE)
+      system2(python, c(shQuote(file.path(scripts, "make_qmd.py")), shQuote(q[[1]]), shQuote(file.path(out$dir, "py"))),
+              stdout = FALSE, stderr = FALSE)
+      read_qmd <- function(d) readLines(list.files(d, pattern = "\\.qmd$", full.names = TRUE), encoding = "UTF-8")
+      expect_identical(read_qmd(file.path(out$dir, "py")), read_qmd(file.path(out$dir, "r")), info = q[[2]])
     }
   }
 })

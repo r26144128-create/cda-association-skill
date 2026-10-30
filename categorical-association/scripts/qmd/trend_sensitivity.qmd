@@ -1,0 +1,6 @@
+
+## 敏感度分析：改用等距分數（Agresti §2.5.4）
+
+```{r}
+m2(tab, seq_len(nrow(tab)), {{v_equal}})
+```

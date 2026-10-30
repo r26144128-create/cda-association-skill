@@ -1,0 +1,20 @@
+
+## 次數表
+
+```{r}
+tab <- xtabs({{formula}}, data = df)   # 列 = 解釋變數 X，欄 = 結果變數 Y
+addmargins(tab)
+round(prop.table(tab, 1), 4)           # 各組（列）的條件比例
+```
+
+## 卡方檢定（Agresti §2.4）
+
+```{r}
+ct <- chisq.test(tab, correct = FALSE)
+ct                                     # Pearson X²
+G2 <- 2 * sum(ifelse(tab > 0, tab * log(tab / ct$expected), 0))
+c(G2 = G2, df = unname(ct$parameter), p = pchisq(G2, ct$parameter, lower.tail = FALSE))
+round(ct$expected, 2)                  # 期望次數
+c(最小期望次數 = min(ct$expected), 小於5的格數 = sum(ct$expected < 5))
+round(ct$stdres, 2)                    # 標準化殘差：|r| > 2 的格子明顯偏離獨立（§2.4.5）
+```

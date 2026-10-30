@@ -1,0 +1,12 @@
+
+## 勝算比與 score 信賴區間（Agresti §2.3）
+
+case-control 研究中結果的比例由研究設計決定，不能估計比例差或相對風險，只報告勝算比（§2.3.5）。
+
+```{r}
+s <- {{success}}                       # 「成功」的類別
+y1 <- tab[1, s]; n1 <- sum(tab[1, ])
+y2 <- tab[2, s]; n2 <- sum(tab[2, ])
+c(勝算比 = (y1 * (n2 - y2)) / ((n1 - y1) * y2),
+  PropCIs::orscoreci(y1, n1, y2, n2, conf.level = {{conf}})$conf.int)
+```
