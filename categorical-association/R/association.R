@@ -398,7 +398,7 @@ cda_stratified <- function(data, x, y, z, count = NULL, success = NULL, conf.lev
   tab3 <- stats::xtabs(.count_formula(c(x, y, z), count), data = d)[, c(s, fail), , drop = FALSE]
   xl <- dimnames(tab3)[[1]]; zl <- dimnames(tab3)[[3]]
   K <- length(zl)
-  if (K < 2) stop(z, " 至少要有 2 個類別才能做分層分析。")
+  if (K < 2) stop(z, " 至少要有 2 個類別才能控制它做 CMH 檢定。")
 
   odds_ratio <- function(t) (t[1, 1] * t[2, 2]) / (t[1, 2] * t[2, 1])
   stratum_row <- function(t, label) {
@@ -505,7 +505,7 @@ cda_stratified <- function(data, x, y, z, count = NULL, success = NULL, conf.lev
   if (any(apply(tab3, 3, function(t) any(t == 0)))) {
     warnings[[length(warnings) + 1]] <- cda_warning(
       "ZERO_CELL",
-      paste0("有分層表出現 0 次的格子，該層勝算比可能是 0、∞、無法計算或非常不穩定，請看原始次數表；",
+      paste0("有某一層的次數表出現 0 次的格子，該層勝算比可能是 0、∞、無法計算或非常不穩定，請看原始次數表；",
              "這裡使用 score 信賴區間，沒有加 0.5 修正。"),
       "§2.3.3, §5.3.3")
   }
@@ -522,12 +522,12 @@ cda_stratified <- function(data, x, y, z, count = NULL, success = NULL, conf.lev
   names(partial)[1:3] <- c(x, y, z)
   cda_result(
     method = "stratified", book_ref = "§2.7, §4.3.4", tier = "A",
-    method_label = "三因子表：分層勝算比、Simpson 悖論與 CMH 檢定",
+    method_label = "三因子表：條件勝算比、Simpson 悖論與 CMH 檢定",
     estimates = estimates, tests = tests,
     tables = list(partial_tables = partial, strata = rbind(strata, marginal)),
     warnings = warnings, facts = c(prep$facts, facts),
     notes = list(variables = list(x = x, y = y, z = z), success = s,
                  reminder = paste0("同質關聯檢定只是輔助：P > 0.05 不代表共同勝算比一定適合（小樣本時檢定力可能不足），",
-                                   "請一併檢視各層勝算比、信賴區間與分層圖。控制變數只能排除「有測量到的」第三變數；",
+                                   "請一併檢視各層勝算比、信賴區間與各層的圖。控制變數只能排除「有測量到的」第三變數；",
                                    "觀察資料中仍可能有其他混淆因子（§2.7）。")))
 }

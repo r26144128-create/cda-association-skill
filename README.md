@@ -84,7 +84,7 @@ claude.ai 網頁版：在「設定 → 功能」開啟程式碼執行，再到�
 | `資料總覽_<資料>.md`、`profile.json` | 階段 1：每個變數的次數、比例、缺失、型態猜測；資料結構的提示 |
 | `初步檢視_<資料>.md`、`check.json`、`bar_*.png`、`relation.png` | 階段 2：問題用到的變數的長條圖、關係圖、次數表、期望次數 |
 | `分析報告_<資料>_<方法>.md` | 完整報告：次數表、檢定、效果量、注意事項、圖，以及 Claude 補在最前面的白話結論 |
-| `*.png` | 條件比例圖、殘差圖、趨勢圖或分層勝算比圖 |
+| `*.png` | 條件比例圖、殘差圖、趨勢圖或各層條件勝算比圖 |
 | `result.json` | 所有數字（給程式讀） |
 | `spec.json` | 這次的判斷紀錄：問題、變數型態、資料結構、方法與理由 |
 | `reproduce.R`（網頁版為 `reproduce.py`） | 自己重跑這次分析的程式碼 |
@@ -134,7 +134,7 @@ Rscript -e "testthat::test_dir('dev/tests')"
 
 - `dev/tests/test-association.R`：用教科書的例子（政黨×性別、阿斯匹靈、品茶、飲酒與畸形、死刑判決）檢查每個數字都和課本一致
 - `dev/tests/test-association.R` 也檢查注意事項清單的規則：Cochran 準則、0 cell 與空類別、缺失比例、各層方向不一致、小組人數提醒、兩種趨勢檢定的命名與拒絕條件
-- `dev/tests/test-skill.R`：資料判斷、recode、階段 1–4 的程式端對端、模式 2 的 R 程式碼和引擎結果一致、qmd 分析檔裡的 R 程式碼單獨執行也得到相同的數字、不支援的分析會拒絕、示範資料的預期結果（`Mjob`／`Fjob` 要被偵測為可能的配對資料），以及用 R 內建資料（`Titanic`、`UCBAdmissions`、MASS 的 `housing`）測次數表、趨勢與分層分析（另用 R 內建函式重算）
+- `dev/tests/test-skill.R`：資料判斷、recode、階段 1–4 的程式端對端、模式 2 的 R 程式碼和引擎結果一致、qmd 分析檔裡的 R 程式碼單獨執行也得到相同的數字、不支援的分析會拒絕、示範資料的預期結果（`Mjob`／`Fjob` 要被偵測為可能的配對資料），以及用 R 內建資料（`Titanic`、`UCBAdmissions`、MASS 的 `housing`）測次數表、趨勢與 CMH 檢定（另用 R 內建函式重算）
 - `dev/tests/test-python.R`：Python 版和 R 版逐項比對：第 1–2 步的總表與檢查數字（11 份資料、9 個問題），以及第 4 步 16 個分析案例的 `result.json`、報告檔與 qmd 分析檔（沒有 Python 時自動略過）
 
 沒有下載課本資料時，用到這些資料的測試會自動略過。

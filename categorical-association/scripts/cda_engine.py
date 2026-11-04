@@ -722,7 +722,7 @@ def cda_stratified(data, x, y, z, count=None, success=None, conf_level=0.95):
     zl = [str(l) for l in d[z].cat.categories]
     K = len(zl)
     if K < 2:
-        raise CdaError("%s 至少要有 2 個類別才能做分層分析。" % z)
+        raise CdaError("%s 至少要有 2 個類別才能控制它做 CMH 檢定。" % z)
     tabs = {}
     for k in zl:
         keep = d[z].astype(str) == k
@@ -833,7 +833,7 @@ def cda_stratified(data, x, y, z, count=None, success=None, conf_level=0.95):
             "§4.3.4, §5.2.1"))
     if any((tabs[k].values == 0).any() for k in zl):
         warnings.append(warning(
-            "ZERO_CELL", "有分層表出現 0 次的格子，該層勝算比可能是 0、∞、無法計算或非常不穩定，請看原始次數表；"
+            "ZERO_CELL", "有某一層的次數表出現 0 次的格子，該層勝算比可能是 0、∞、無法計算或非常不穩定，請看原始次數表；"
             "這裡使用 score 信賴區間，沒有加 0.5 修正。", "§2.3.3, §5.3.3"))
     mu = 1 / (1 + np.exp(-(X @ fit["coef"])))
     n_cell = succ + fl
@@ -842,13 +842,13 @@ def cda_stratified(data, x, y, z, count=None, success=None, conf_level=0.95):
 
     partial = [{x: a, y: b, z: k, "count": float(tabs[k].loc[a, b])} for k in zl for b in (s, fail) for a in xl]
     return {
-        "method": "stratified", "method_label": "三因子表：分層勝算比、Simpson 悖論與 CMH 檢定",
+        "method": "stratified", "method_label": "三因子表：條件勝算比、Simpson 悖論與 CMH 檢定",
         "book_ref": "§2.7, §4.3.4", "tier": "A", "estimates": estimates, "tests": tests,
         "tables": {"partial_tables": partial, "strata": strata + [marginal]},
         "warnings": warnings, "facts": prep_facts + facts,
         "notes": {"variables": {"x": x, "y": y, "z": z}, "success": s,
                   "reminder": "同質關聯檢定只是輔助：P > 0.05 不代表共同勝算比一定適合（小樣本時檢定力可能不足），"
-                              "請一併檢視各層勝算比、信賴區間與分層圖。控制變數只能排除「有測量到的」第三變數；"
+                              "請一併檢視各層勝算比、信賴區間與各層的圖。控制變數只能排除「有測量到的」第三變數；"
                               "觀察資料中仍可能有其他混淆因子（§2.7）。"}}
 
 # ---------------------------------------------------------------- JSON (cda_to_json)

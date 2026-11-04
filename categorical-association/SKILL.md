@@ -1,6 +1,6 @@
 ---
 name: categorical-association
-description: 分析兩個類別變數之間有沒有關聯（列聯表、卡方檢定、Fisher 精確檢定、比例差／相對風險／勝算比、有序變數的 Cochran–Armitage 趨勢檢定與 linear-by-linear association 檢定、控制第三個變數的分層分析與 CMH 檢定、Simpson 悖論）。使用者提供 CSV/Excel 資料檔或一張次數表，並問「A 和 B 有沒有關係」「哪一組比例比較高」「控制 C 之後還有關係嗎」時使用。依據 Agresti《An Introduction to Categorical Data Analysis》第 3 版第 1–2 章。
+description: 分析兩個類別變數之間有沒有關聯（列聯表、卡方檢定、Fisher 精確檢定、比例差／相對風險／勝算比、有序變數的 Cochran–Armitage 趨勢檢定與 linear-by-linear association 檢定、控制第三個變數的 CMH 檢定與條件勝算比、Simpson 悖論）。使用者提供 CSV/Excel 資料檔或一張次數表，並問「A 和 B 有沒有關係」「哪一組比例比較高」「控制 C 之後還有關係嗎」時使用。依據 Agresti《An Introduction to Categorical Data Analysis》第 3 版第 1–2 章。
 ---
 
 # 類別變數關聯分析 Skill（categorical-association）
@@ -176,7 +176,7 @@ python scripts/run_analysis.py <資料檔> spec.json <輸出資料夾>    # 模�
 
 1. **一句話結論**：回答使用者的問題（看檢定 P 值；出現 `LOW_EXPECTED` 時以 Fisher 檢定為準）。
 2. **關聯的樣子**：用各組比例與標準化殘差（|殘差| > 2 的格子）說明哪裡不一樣，附上圖。
-3. **關聯的強度**：一律同時報告效果量與信賴區間（2×2 表：比例差、相對風險、勝算比；分層：各層勝算比），並說明意義。
+3. **關聯的強度**：一律同時報告效果量與信賴區間（2×2 表：比例差、相對風險、勝算比；三因子表：各層的條件勝算比），並說明意義。
 4. **注意事項**：逐條說明 `warnings`（附節號），以及對結論的影響。
 5. **限制與下一步**：需要控制更多變數或資料不獨立時，轉介對應的 Skill。
 

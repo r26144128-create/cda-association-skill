@@ -79,7 +79,7 @@
 - **狀況**：不同 strata 的效果大小或方向不同。
 - **為什麼要注意**：common OR 是合併後的單一數字，各層差很多時，它代表不了整體；方向相反的層還會互相抵消。
 - **標示與做法**：
-  - 不論 homogeneity test 是否顯著，一律列出：每層 OR、每層 CI、效果方向、分層圖。
+  - 不論 homogeneity test 是否顯著，一律列出：每層 OR、每層 CI、效果方向、各層的圖。
   - 不同 strata 的 OR 方向相反（一層 OR > 1、另一層 OR < 1）：自動標 ⚠️，不能只報 common OR。
   - homogeneity test 顯著：標 ⚠️。
   - homogeneity test 只作為輔助；P > 0.05 不可以自動判定 common OR 一定適合，因為小樣本時檢定力可能不足。

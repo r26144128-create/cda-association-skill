@@ -1,5 +1,5 @@
 
-## 分層次數表
+## 各層次數表（部分表）
 
 ```{r}
 tab3 <- xtabs({{formula}}, data = df)
