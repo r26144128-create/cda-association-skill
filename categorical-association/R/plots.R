@@ -74,14 +74,16 @@ plot_stratified <- function(result) {
     ggplot2::theme_minimal(base_size = 13)
 }
 
-# The plots that belong to each analysis, keyed by file name.
+# The plots that belong to each analysis, keyed by file name. Stage 2 already shows the
+# conditional proportions (relation.png), so stage 4 draws only plots that add something:
+# the residual heat map for tables larger than 2×2 (in a 2×2 table all four residuals share
+# one absolute value, √X²), the trend line for a binary y, and the strata next to the
+# marginal table. Otherwise it draws nothing and the report points back to relation.png.
 cda_plots <- function(result) {
+  tab <- result$tables$counts
   switch(result$method,
-    # A 2×2 table has one df: all four residuals share one absolute value (√X²), so the heat
-    # map would add nothing; it is drawn only for larger tables.
-    crosstab = c(list(conditional_props = plot_conditional_props(result)),
-                 if (any(dim(result$tables$counts) > 2)) list(residuals = plot_residuals(result))),
-    trend = list(trend = plot_trend(result)),
+    crosstab = if (any(dim(tab) > 2)) list(residuals = plot_residuals(result)) else list(),
+    trend = if (ncol(tab) == 2) list(trend = plot_trend(result)) else list(),
     stratified = list(stratified = plot_stratified(result)),
     list())
 }

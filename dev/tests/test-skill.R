@@ -89,7 +89,7 @@ test_that("q1 romantic × pass: crosstab writes result, plots, report and reprod
   or <- r$json$estimates[r$json$estimates$measure == "odds ratio", ]
   expect_equal(c(or$estimate, or$lower, or$upper), c(0.63642, 0.41435, 0.97750), tolerance = 1e-4)
   expect_setequal(list.files(r$dir), c("result.json", "spec.json", "reproduce.R",
-                                       "conditional_props.png", "分析報告_student_por_crosstab.md"))   # 2×2: no heat map
+                                       "分析報告_student_por_crosstab.md"))   # 2×2: stage 2 already drew the proportions
   report <- readLines(file.path(r$dir, "分析報告_student_por_crosstab.md"), encoding = "UTF-8")
   expect_true(any(grepl("4.2767", report, fixed = TRUE)))   # the report carries R's numbers
 })

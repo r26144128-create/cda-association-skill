@@ -173,13 +173,16 @@ def plot_stratified(res):
     save(fig, "stratified")
 
 
-# A 2×2 table has one df: all four residuals share one absolute value (√X²), so the heat map
-# would add nothing; it is drawn only for larger tables (same as cda_plots() in R).
-big_table = analysis == "crosstab" and max(result["tables"]["counts"].shape) > 2
-plot_names = {"crosstab": ["conditional_props"] + (["residuals"] if big_table else []),
-              "trend": ["trend"], "stratified": ["stratified"]}[analysis]
-{"crosstab": lambda r: (plot_conditional_props(r), plot_residuals(r) if big_table else None),
- "trend": plot_trend, "stratified": plot_stratified}[analysis](result)
+# Same choice as cda_plots() in R: stage 2 already shows the conditional proportions
+# (relation.png), so only plots that add something are drawn here.
+if analysis == "crosstab":
+    plot_names = ["residuals"] if max(result["tables"]["counts"].shape) > 2 else []
+elif analysis == "trend":
+    plot_names = ["trend"] if result["tables"]["counts"].shape[1] == 2 else []
+else:
+    plot_names = ["stratified"]
+for name in plot_names:
+    {"residuals": plot_residuals, "trend": plot_trend, "stratified": plot_stratified}[name](result)
 result["plots"] = [p + ".png" for p in plot_names]
 
 # ---- Markdown report (same layout as run_analysis.R) ----
@@ -230,7 +233,13 @@ if result["estimates"]:
                                               ["measure", "estimate", "lower", "upper", "ci_method", "book_ref"]) + [""]
 if result["warnings"]:
     report += ["## 注意事項", ""] + ["- %s（Agresti %s）" % (w["message"], w["book_ref"]) for w in result["warnings"]] + [""]
-report += ["## 圖", ""] + ["![](%s)" % p for p in result["plots"]] + ["", "> %s" % result["notes"]["reminder"]]
+if result["plots"]:
+    plot_md = ["![](%s)" % p for p in result["plots"]]
+else:
+    plot_md = ["各組比例的圖在階段 2（`relation.png`），這裡不重畫。"]
+    if os.path.exists(os.path.join(out_dir, "relation.png")):
+        plot_md += ["", "![](relation.png)"]
+report += ["## 圖", ""] + plot_md + ["", "> %s" % result["notes"]["reminder"]]
 report_file = os.path.join(out_dir, "分析報告_%s_%s.md" % (data_name, analysis))
 cd.write_lines(report, report_file)
 result["report"] = os.path.basename(report_file)

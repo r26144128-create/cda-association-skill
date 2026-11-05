@@ -96,6 +96,9 @@ count_md <- if (!is.null(counts) && length(dim(counts)) == 2) {
   md_table(cbind(data.frame(` ` = rownames(m), check.names = FALSE), as.data.frame.matrix(m)), digits = 0)
 } else if (!is.null(result$tables$partial_tables)) md_table(result$tables$partial_tables, digits = 0) else character()
 data_name <- tools::file_path_sans_ext(basename(data_file))
+plot_md <- if (length(result$plots) > 0) sprintf("![](%s)", result$plots) else c(
+  "各組比例的圖在階段 2（`relation.png`），這裡不重畫。",
+  if (file.exists(file.path(out_dir, "relation.png"))) c("", "![](relation.png)"))
 report <- c(
   sprintf("# 分析報告：%s", spec$question %||% result$method_label), "",
   sprintf("- 資料檔：`%s`", basename(data_file)),
@@ -108,7 +111,7 @@ report <- c(
   if (nrow(result$estimates) > 0) c("## 效果量與信賴區間", "", md_table(result$estimates), ""),
   if (length(result$warnings) > 0) c("## 注意事項", "",
     vapply(result$warnings, function(w) sprintf("- %s（Agresti %s）", w$message, w$book_ref), ""), ""),
-  "## 圖", "", sprintf("![](%s)", result$plots), "",
+  "## 圖", "", plot_md, "",
   sprintf("> %s", result$notes$reminder))
 report_file <- file.path(out_dir, sprintf("分析報告_%s_%s.md", data_name, spec$analysis))
 writeLines(report, report_file, useBytes = TRUE)
