@@ -11,7 +11,8 @@
 #   analysis "trend" also takes "x_scores" / "y_scores"; "stratified" takes "z".
 #   Optional "recode" creates new categorical variables first (see cda_recode in R/utils.R).
 #
-# Writes to <output dir>: result.json, PNG plots, 分析報告_<data>_<analysis>.md, reproduce.R.
+# Writes to <output dir>: result.json, PNG plots, 分析報告_<data>_<analysis>.md (ending with stand-alone
+# R code from make_qmd.R --report), reproduce.R.
 # On failure, result.json contains {"error": "..."} and the script exits with status 1.
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -129,5 +130,11 @@ if (!file.exists(spec_copy) || normalizePath(spec_file) != normalizePath(spec_co
   invisible(file.copy(spec_file, spec_copy, overwrite = TRUE))
 }
 cda_to_json(result, file.path(out_dir, "result.json"))
+
+# The report ends with the same stand-alone R code as the qmd file (make_qmd.R reads result.json).
+status <- system2(file.path(R.home("bin"), "Rscript"),
+                  shQuote(c(file.path(dirname(normalizePath(sub("^--file=", "", script_arg[1]))), "make_qmd.R"),
+                            data_file, out_dir, "--report")), stdout = FALSE, stderr = FALSE)
+if (status != 0) message("NOTE: 報告沒有加上 R 程式碼（make_qmd.R 執行失敗）。")
 message("OK: ", normalizePath(file.path(out_dir, "result.json")))
 message("REPORT: ", normalizePath(report_file))

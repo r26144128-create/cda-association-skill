@@ -28,6 +28,7 @@ execute:
 ```{r}
 library(ggplot2)
 data_file <- {{data_file_q}}   # 資料檔名：檔名不一樣時改這一行
+if (!file.exists(data_file)) stop("找不到資料檔 ", data_file, "：請把它和這個檔案放在同一個資料夾，或把上一行改成資料檔的完整路徑。")
 {{read_code}}
 ```
 {{recode_block}}

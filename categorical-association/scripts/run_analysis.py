@@ -2,7 +2,8 @@
 #
 # Usage: python run_analysis.py <data file> <spec.json> <output dir>
 #
-# Writes to <output dir>: result.json, PNG plots, 分析報告_<data>_<analysis>.md, reproduce.py,
+# Writes to <output dir>: result.json, PNG plots, 分析報告_<data>_<analysis>.md (ending with stand-alone
+# R code from make_qmd.py --report), reproduce.py,
 # and a copy of spec.json. On failure, result.json contains {"error": "..."} and the script
 # exits with status 1. All numbers come from cda_engine.py, which mirrors R/association.R.
 
@@ -10,6 +11,7 @@ import json
 import math
 import os
 import shutil
+import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -245,5 +247,11 @@ out = ce.to_json(result)
 if len(out["plots"]) == 1:          # R's jsonlite writes a one-element vector as a scalar
     out["plots"] = out["plots"][0]
 cd.write_json(out, os.path.join(out_dir, "result.json"))
+
+# The report ends with the same stand-alone R code as the qmd file (make_qmd.py reads result.json).
+status = subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "make_qmd.py"),
+                         data_file, out_dir, "--report"], capture_output=True).returncode
+if status != 0:
+    print("NOTE: 報告沒有加上 R 程式碼（make_qmd.py 執行失敗）。")
 print("OK:", os.path.abspath(os.path.join(out_dir, "result.json")))
 print("REPORT:", os.path.abspath(report_file))

@@ -249,6 +249,29 @@ run_qmd <- function(spec, data = student_file) {
 }
 est_of <- function(json) setNames(json$estimates$estimate, json$estimates$measure)
 
+test_that("the report ends with R code that runs on its own and reproduces the numbers", {
+  r <- run_skill(list(analysis = "stratified", x = "romantic", y = "passed", z = "school", success = "pass",
+                      recode = list(passed = list(from = "G3", breaks = 10, labels = c("fail", "pass")))))
+  report <- readLines(list.files(r$dir, pattern = "^分析報告_.*\\.md$", full.names = TRUE), encoding = "UTF-8")
+  start <- which(report == "## R 程式碼")
+  expect_length(start, 1)
+  fence <- which(report == "```r")
+  code <- report[(fence + 1):(max(which(report == "```")) - 1)]
+  work <- tempfile("report-code-")
+  dir.create(work)
+  file.copy(student_file, file.path(work, basename(student_file)))
+  writeLines(code, file.path(work, "code.R"), useBytes = TRUE)
+  env <- new.env()
+  old <- setwd(work)
+  on.exit(setwd(old))
+  pdf(NULL)
+  suppressWarnings(sys.source("code.R", envir = env))
+  dev.off()
+  expect_equal(env$LR, stat_of(r$json, "LR test of conditional independence (beta = 0)"), tolerance = 1e-8)
+  expect_equal(unname(mantelhaen.test(env$tab3, correct = FALSE)$statistic),
+               stat_of(r$json, "Cochran-Mantel-Haenszel (score test, beta = 0)"), tolerance = 1e-8)
+})
+
 test_that("make_qmd.R: crosstab qmd (with recode) reproduces X², G² and the score intervals", {
   out <- run_qmd(list(analysis = "crosstab", x = "romantic", y = "passed", success = "pass", design = "cross-sectional",
                       recode = list(passed = list(from = "G3", breaks = 10, labels = c("fail", "pass"))),

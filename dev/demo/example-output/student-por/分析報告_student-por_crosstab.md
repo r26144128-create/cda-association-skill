@@ -50,3 +50,56 @@
 ![](residuals.png)
 
 > 卡方檢定只回答「有沒有證據顯示有關聯」，不代表關聯有多強；強度要看比例、勝算比與殘差（§2.4.7）。
+
+## R 程式碼
+
+重新計算上面所有數字和圖的 R 程式碼，只需要 CRAN 套件。把它和資料檔 `student-por.csv` 放在同一個資料夾執行；第一次使用先安裝套件：`install.packages(c("readr", "readxl", "ggplot2", "scales", "PropCIs"))`。
+
+```r
+library(ggplot2)
+data_file <- "student-por.csv"   # 資料檔名：檔名不一樣時改這一行
+if (!file.exists(data_file)) stop("找不到資料檔 ", data_file, "：請把它和這個檔案放在同一個資料夾，或把上一行改成資料檔的完整路徑。")
+df <- as.data.frame(readr::read_delim(data_file, delim = ";",
+  locale = readr::locale(encoding = "UTF-8"), show_col_types = FALSE))
+
+# 類別順序（沒有指定的變數依代碼排序）
+df[["address"]] <- factor(df[["address"]], levels = c("U", "R"))
+df[["internet"]] <- factor(df[["internet"]], levels = c("yes", "no"))
+# 排除分析變數有缺失的列（有缺失一律報告；≥ 5% 要提醒）
+vars <- c("address", "internet")
+miss <- !complete.cases(df[vars])
+c(排除筆數 = sum(miss), 比例 = mean(miss))
+df <- df[!miss, ]
+df[vars] <- droplevels(df[vars])   # 沒有觀察值的類別從分析中移除
+
+tab <- xtabs(~ `address` + `internet`, data = df)   # 列 = 解釋變數 X，欄 = 結果變數 Y
+addmargins(tab)
+round(prop.table(tab, 1), 4)           # 各組（列）的條件比例
+
+ct <- chisq.test(tab, correct = FALSE)
+ct                                     # Pearson X²
+G2 <- 2 * sum(ifelse(tab > 0, tab * log(tab / ct$expected), 0))
+c(G2 = G2, df = unname(ct$parameter), p = pchisq(G2, ct$parameter, lower.tail = FALSE))
+round(ct$expected, 2)                  # 期望次數
+c(最小期望次數 = min(ct$expected), 小於5的格數 = sum(ct$expected < 5))
+round(ct$stdres, 2)                    # 標準化殘差：|r| > 2 的格子明顯偏離獨立（§2.4.5）
+
+fisher.test(tab)                       # 雙尾
+
+s <- "yes"                       # 「成功」的類別
+y1 <- tab[1, s]; n1 <- sum(tab[1, ])
+y2 <- tab[2, s]; n2 <- sum(tab[2, ])
+p1 <- y1 / n1; p2 <- y2 / n2
+ci <- rbind(PropCIs::diffscoreci(y1, n1, y2, n2, conf.level = 0.95)$conf.int,
+            PropCIs::riskscoreci(y1, n1, y2, n2, conf.level = 0.95)$conf.int,
+            PropCIs::orscoreci(y1, n1, y2, n2, conf.level = 0.95)$conf.int)
+data.frame(量數 = c("比例差", "相對風險", "勝算比"),
+           估計值 = c(p1 - p2, p1 / p2, (y1 * (n2 - y2)) / ((n1 - y1) * y2)),
+           下限 = ci[, 1], 上限 = ci[, 2])
+
+ggplot(as.data.frame(prop.table(tab, 1)), aes(x = .data[["address"]], y = Freq, fill = .data[["internet"]])) +
+  geom_col() +
+  scale_y_continuous(labels = scales::percent) +
+  labs(y = "比例") +
+  theme_minimal()
+```

@@ -35,6 +35,7 @@ execute:
 ```{r}
 library(ggplot2)
 data_file <- "student-por.csv"   # 資料檔名：檔名不一樣時改這一行
+if (!file.exists(data_file)) stop("找不到資料檔 ", data_file, "：請把它和這個檔案放在同一個資料夾，或把上一行改成資料檔的完整路徑。")
 df <- as.data.frame(readr::read_delim(data_file, delim = ";",
   locale = readr::locale(encoding = "UTF-8"), show_col_types = FALSE))
 ```

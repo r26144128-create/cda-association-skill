@@ -1,17 +1,22 @@
 # Write a reproducible Quarto file for one finished analysis (end of stage 5, only when the
 # user asks for it).
 #
-# Usage: Rscript make_qmd.R <data file> <output dir>
+# Usage: Rscript make_qmd.R <data file> <output dir> [--report]
 #
 # Reads spec.json and result.json from <output dir> (written by run_analysis.R) and writes
 # 分析_<data>_<analysis>.qmd there. The R code in the file needs only CRAN packages, not this
 # Skill, and recomputes every number. The text pieces live in scripts/qmd/ and are shared with
 # make_qmd.py, so both versions write the same file. Claude then replaces the marker under
 # "## 結論與解釋" with the stage-5 interpretation.
+#
+# With --report (called by run_analysis.R), no qmd is written: the same R code is appended to
+# the analysis report as a section "## R 程式碼".
 
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 2) stop("Usage: Rscript make_qmd.R <data file> <output dir>")
-data_file <- args[1]; out_dir <- args[2]
+if (!(length(args) == 2 || (length(args) == 3 && args[3] == "--report"))) {
+  stop("Usage: Rscript make_qmd.R <data file> <output dir> [--report]")
+}
+data_file <- args[1]; out_dir <- args[2]; report_mode <- length(args) == 3
 script_arg <- grep("^--file=", commandArgs(FALSE), value = TRUE)
 qmd_dir <- file.path(dirname(normalizePath(sub("^--file=", "", script_arg[1]))), "qmd")
 
@@ -138,8 +143,26 @@ warnings_block <- if (length(w) > 0 && NROW(w) > 0) {
 } else ""
 pieces <- c(pieces, fill("footer.qmd", list(warnings_block = warnings_block, reminder = result$notes$reminder)))
 
-out_file <- file.path(out_dir, sprintf("分析_%s_%s.qmd", tools::file_path_sans_ext(base), analysis))
-con <- file(out_file, open = "wb")
-writeBin(charToRaw(enc2utf8(paste0(paste(pieces, collapse = "\n"), "\n"))), con)
-close(con)
-message("QMD: ", normalizePath(out_file))
+qmd_text <- paste0(paste(pieces, collapse = "\n"), "\n")
+
+if (report_mode) {
+  # Only the code chunks go into the report, without the Quarto text around them.
+  lines <- strsplit(qmd_text, "\n", fixed = TRUE)[[1]]
+  ends <- which(lines == "```")
+  chunks <- vapply(which(lines == "```{r}"), function(s) {
+    paste(lines[(s + 1):(min(ends[ends > s]) - 1)], collapse = "\n")
+  }, "")
+  report_file <- file.path(out_dir, result$report)
+  report <- readLines(report_file, encoding = "UTF-8", warn = FALSE)
+  writeLines(c(report, "", "## R 程式碼", "",
+    sprintf(paste0("重新計算上面所有數字和圖的 R 程式碼，只需要 CRAN 套件。把它和資料檔 `%s` 放在同一個資料夾執行；",
+                   "第一次使用先安裝套件：`install.packages(c(\"readr\", \"readxl\", \"ggplot2\", \"scales\", \"PropCIs\"))`。"), base),
+    "", "```r", paste(chunks, collapse = "\n\n"), "```"), report_file, useBytes = TRUE)
+  message("REPORT CODE: ", normalizePath(report_file))
+} else {
+  out_file <- file.path(out_dir, sprintf("分析_%s_%s.qmd", tools::file_path_sans_ext(base), analysis))
+  con <- file(out_file, open = "wb")
+  writeBin(charToRaw(enc2utf8(qmd_text)), con)
+  close(con)
+  message("QMD: ", normalizePath(out_file))
+}

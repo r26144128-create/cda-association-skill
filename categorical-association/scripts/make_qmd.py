@@ -1,20 +1,24 @@
 # Write a reproducible Quarto file for one finished analysis without R (claude.ai):
 # same input and output as make_qmd.R, built from the same text pieces in scripts/qmd/.
 #
-# Usage: python make_qmd.py <data file> <output dir>
+# Usage: python make_qmd.py <data file> <output dir> [--report]
 #
 # Reads spec.json and result.json from <output dir> and writes 分析_<data>_<analysis>.qmd there.
 # The file contains R code that needs only CRAN packages; Claude then replaces the marker
 # under "## 結論與解釋" with the stage-5 interpretation.
+#
+# With --report (called by run_analysis.py), no qmd is written: the same R code is appended to
+# the analysis report as a section "## R 程式碼".
 
 import json
 import os
 import re
 import sys
 
-if len(sys.argv) != 3:
-    sys.exit("Usage: python make_qmd.py <data file> <output dir>")
+if not (len(sys.argv) == 3 or (len(sys.argv) == 4 and sys.argv[3] == "--report")):
+    sys.exit("Usage: python make_qmd.py <data file> <output dir> [--report]")
 data_file, out_dir = sys.argv[1:3]
+report_mode = len(sys.argv) == 4
 qmd_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "qmd")
 
 with open(os.path.join(out_dir, "spec.json"), encoding="utf-8") as f:
@@ -187,7 +191,28 @@ warnings_block = ("\n## 注意事項\n\n" + "\n".join("- %s（Agresti %s）" % (
                   if warnings else "")
 pieces.append(fill("footer.qmd", {"warnings_block": warnings_block, "reminder": result["notes"]["reminder"]}))
 
-out_file = os.path.join(out_dir, "分析_%s_%s.qmd" % (os.path.splitext(base)[0], analysis))
-with open(out_file, "w", encoding="utf-8", newline="") as f:
-    f.write("\n".join(pieces) + "\n")
-print("QMD:", os.path.abspath(out_file))
+qmd_text = "\n".join(pieces) + "\n"
+
+if report_mode:
+    # Only the code chunks go into the report, without the Quarto text around them.
+    lines = qmd_text.split("\n")
+    chunks = []
+    for i, line in enumerate(lines):
+        if line == "```{r}":
+            end = lines.index("```", i + 1)
+            chunks.append("\n".join(lines[i + 1:end]))
+    report_file = os.path.join(out_dir, result["report"])
+    with open(report_file, encoding="utf-8") as f:
+        report = f.read().splitlines()
+    report += ["", "## R 程式碼", "",
+               "重新計算上面所有數字和圖的 R 程式碼，只需要 CRAN 套件。把它和資料檔 `%s` 放在同一個資料夾執行；"
+               "第一次使用先安裝套件：`install.packages(c(\"readr\", \"readxl\", \"ggplot2\", \"scales\", \"PropCIs\"))`。" % base,
+               "", "```r", "\n\n".join(chunks), "```"]
+    with open(report_file, "w", encoding="utf-8") as f:
+        f.write("\n".join(report) + "\n")
+    print("REPORT CODE:", os.path.abspath(report_file))
+else:
+    out_file = os.path.join(out_dir, "分析_%s_%s.qmd" % (os.path.splitext(base)[0], analysis))
+    with open(out_file, "w", encoding="utf-8", newline="") as f:
+        f.write(qmd_text)
+    print("QMD:", os.path.abspath(out_file))
