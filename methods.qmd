@@ -69,18 +69,47 @@ cram_cmh <- mantelhaen.test(cram, correct = FALSE)
 以上方法都假設**每一列是不同、互不相關的個體**。同一個人測兩次、前後測、同一個學生的兩科成績，都不符合，要改用配對資料的方法（組員 Part 3 的 Skill）。
 :::
 
-```{mermaid}
-flowchart LR
-    A[兩個類別變數] --> B{每列獨立？}
-    B -- 否 --> P3[配對／相關資料方法]
-    B -- 是 --> C{要控制第三個變數？}
-    C -- 是 --> S[CMH 檢定]
-    C -- 否 --> D{有變數有順序？}
-    D -- 是 --> T[趨勢檢定]
-    D -- 否 --> E{期望次數夠大？}
-    E -- 是 --> X[卡方檢定]
-    E -- 否 --> F[Fisher 精確檢定]
+::: {.column-body-outset}
+```{=html}
+<svg class="dtree" viewBox="0 0 940 630" role="img" aria-label="選方法的決策樹">
+  <style>
+    .dtree { width: 100%; max-width: 940px; display: block; margin: 1.5em auto; font-family: inherit; }
+    .dtree rect, .dtree polygon { fill: #eaf1fb; stroke: #6c7a89; stroke-width: 1.5; }
+    .dtree text { fill: #1f5fbf; font-size: 22px; text-anchor: middle; }
+    .dtree text.lab { fill: #333; font-size: 20px; font-weight: bold; }
+    .dtree line { stroke: #444; stroke-width: 1.6; }
+  </style>
+  <defs><marker id="dt-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#444"/></marker></defs>
+  <g><rect x="20" y="40" width="200" height="60"/><text x="120" y="77">兩個類別變數</text></g>
+  <line x1="220" y1="70" x2="287" y2="70" marker-end="url(#dt-ah)"/>
+  <g><polygon points="440,25 590,70 440,115 290,70"/><text x="440" y="77">每列獨立？</text></g>
+  <line x1="590" y1="70" x2="675" y2="70" marker-end="url(#dt-ah)"/>
+  <text class="lab" x="632" y="60">否</text>
+  <g><rect x="680" y="40" width="240" height="60"/><text x="800" y="77">配對／相關資料方法</text></g>
+  <line x1="440" y1="115" x2="440" y2="152" marker-end="url(#dt-ah)"/>
+  <text class="lab" x="462" y="142">是</text>
+  <g><polygon points="440,155 590,200 440,245 290,200"/><text x="440" y="207">要控制第三個變數？</text></g>
+  <line x1="590" y1="200" x2="675" y2="200" marker-end="url(#dt-ah)"/>
+  <text class="lab" x="632" y="190">是</text>
+  <g><rect x="680" y="170" width="240" height="60"/><text x="800" y="207">CMH 檢定</text></g>
+  <line x1="440" y1="245" x2="440" y2="282" marker-end="url(#dt-ah)"/>
+  <text class="lab" x="462" y="272">否</text>
+  <g><polygon points="440,285 590,330 440,375 290,330"/><text x="440" y="337">有變數有順序？</text></g>
+  <line x1="590" y1="330" x2="675" y2="330" marker-end="url(#dt-ah)"/>
+  <text class="lab" x="632" y="320">是</text>
+  <g><rect x="680" y="300" width="240" height="60"/><text x="800" y="337">趨勢檢定</text></g>
+  <line x1="440" y1="375" x2="440" y2="412" marker-end="url(#dt-ah)"/>
+  <text class="lab" x="462" y="402">否</text>
+  <g><polygon points="440,415 590,460 440,505 290,460"/><text x="440" y="467">期望次數夠大？</text></g>
+  <line x1="590" y1="460" x2="675" y2="460" marker-end="url(#dt-ah)"/>
+  <text class="lab" x="632" y="450">是</text>
+  <g><rect x="680" y="430" width="240" height="60"/><text x="800" y="467">卡方檢定</text></g>
+  <line x1="440" y1="505" x2="440" y2="557" marker-end="url(#dt-ah)"/>
+  <text class="lab" x="462" y="539">否</text>
+  <g><rect x="320" y="560" width="240" height="60"/><text x="440" y="597">Fisher 精確檢定</text></g>
+</svg>
 ```
+:::
 
 ## 1. 兩組差多少：比例差、相對風險、勝算比
 
