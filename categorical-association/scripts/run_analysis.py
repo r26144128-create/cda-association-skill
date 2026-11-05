@@ -121,7 +121,7 @@ def plot_residuals(res):
         for j in range(r.shape[1]):
             val = r.values[i, j]
             ax.text(j, i, "%.2f" % val, ha="center", va="center", fontsize=12,
-                    fontweight="bold" if abs(val) > 2 else "normal")
+                    fontweight="bold" if abs(val) > 2 else "normal", color="white" if abs(val) > 0.6 * lim else "black")
     ax.set_xticks(range(r.shape[1]), [str(c) for c in r.columns])
     ax.set_yticks(range(r.shape[0]), [str(i) for i in r.index])
     ax.set_xlabel(v["y"]); ax.set_ylabel(v["x"])
@@ -173,8 +173,12 @@ def plot_stratified(res):
     save(fig, "stratified")
 
 
-plot_names = {"crosstab": ["conditional_props", "residuals"], "trend": ["trend"], "stratified": ["stratified"]}[analysis]
-{"crosstab": lambda r: (plot_conditional_props(r), plot_residuals(r)),
+# A 2×2 table has one df: all four residuals share one absolute value (√X²), so the heat map
+# would add nothing; it is drawn only for larger tables (same as cda_plots() in R).
+big_table = analysis == "crosstab" and max(result["tables"]["counts"].shape) > 2
+plot_names = {"crosstab": ["conditional_props"] + (["residuals"] if big_table else []),
+              "trend": ["trend"], "stratified": ["stratified"]}[analysis]
+{"crosstab": lambda r: (plot_conditional_props(r), plot_residuals(r) if big_table else None),
  "trend": plot_trend, "stratified": plot_stratified}[analysis](result)
 result["plots"] = [p + ".png" for p in plot_names]
 

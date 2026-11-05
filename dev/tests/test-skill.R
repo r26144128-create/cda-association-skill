@@ -89,7 +89,7 @@ test_that("q1 romantic × pass: crosstab writes result, plots, report and reprod
   or <- r$json$estimates[r$json$estimates$measure == "odds ratio", ]
   expect_equal(c(or$estimate, or$lower, or$upper), c(0.63642, 0.41435, 0.97750), tolerance = 1e-4)
   expect_setequal(list.files(r$dir), c("result.json", "spec.json", "reproduce.R",
-                                       "conditional_props.png", "residuals.png", "分析報告_student_por_crosstab.md"))
+                                       "conditional_props.png", "分析報告_student_por_crosstab.md"))   # 2×2: no heat map
   report <- readLines(file.path(r$dir, "分析報告_student_por_crosstab.md"), encoding = "UTF-8")
   expect_true(any(grepl("4.2767", report, fixed = TRUE)))   # the report carries R's numbers
 })
@@ -245,9 +245,20 @@ run_qmd <- function(spec, data = student_file) {
   old <- setwd(work)
   on.exit(setwd(old))
   suppressWarnings(sys.source(code, envir = env))          # sparse tables warn, as in the rendered file
-  list(json = r$json, env = env, qmd = readLines(qmd, encoding = "UTF-8"))
+  list(json = r$json, env = env, qmd = readLines(qmd, encoding = "UTF-8"), qmd_file = qmd)
 }
 est_of <- function(json) setNames(json$estimates$estimate, json$estimates$measure)
+
+test_that("the residual heat map is drawn only for tables larger than 2×2, in the report and the qmd", {
+  big <- run_qmd(list(analysis = "crosstab", x = "Fjob", y = "higher"))
+  expect_true(file.exists(file.path(dirname(big$qmd_file), "residuals.png")))
+  expect_true(any(grepl("標準化殘差熱圖", big$qmd, fixed = TRUE)))
+  small <- run_qmd(list(analysis = "crosstab", x = "address", y = "internet"))
+  expect_false(file.exists(file.path(dirname(small$qmd_file), "residuals.png")))
+  expect_false(any(grepl("標準化殘差熱圖", small$qmd, fixed = TRUE)))
+  trend <- run_qmd(list(analysis = "trend", x = "studytime", y = "higher", success = "yes", ordinal = "studytime"))
+  expect_true(any(grepl("geom_line", trend$qmd, fixed = TRUE)))   # same proportion line plot as trend.png
+})
 
 test_that("the report ends with R code that runs on its own and reproduces the numbers", {
   r <- run_skill(list(analysis = "stratified", x = "romantic", y = "passed", z = "school", success = "pass",

@@ -101,6 +101,6 @@
     },
     "reminder": "卡方檢定只回答「有沒有證據顯示有關聯」，不代表關聯有多強；強度要看比例、勝算比與殘差（§2.4.7）。"
   },
-  "plots": ["conditional_props.png", "residuals.png"],
+  "plots": "conditional_props.png",
   "report": "分析報告_student-por_crosstab.md"
 }

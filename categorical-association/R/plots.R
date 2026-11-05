@@ -24,7 +24,9 @@ plot_residuals <- function(result) {
   ggplot2::ggplot(res, ggplot2::aes(x = y, y = x, fill = residual)) +
     ggplot2::geom_tile(colour = "white") +
     ggplot2::geom_text(ggplot2::aes(label = formatC(residual, digits = 2, format = "f"),
-                                    fontface = ifelse(abs(residual) > 2, "bold", "plain")), size = 5) +
+                                    fontface = ifelse(abs(residual) > 2, "bold", "plain"),
+                                    colour = ifelse(abs(residual) > 0.6 * lim, "white", "black")), size = 5) +
+    ggplot2::scale_colour_identity() +
     ggplot2::scale_fill_gradient2(low = "#2166ac", mid = "white", high = "#b2182b",
                                   limits = c(-lim, lim)) +
     ggplot2::labs(x = v$y, y = v$x, fill = "標準化殘差") +
@@ -75,8 +77,10 @@ plot_stratified <- function(result) {
 # The plots that belong to each analysis, keyed by file name.
 cda_plots <- function(result) {
   switch(result$method,
-    crosstab = list(conditional_props = plot_conditional_props(result),
-                    residuals = plot_residuals(result)),
+    # A 2×2 table has one df: all four residuals share one absolute value (√X²), so the heat
+    # map would add nothing; it is drawn only for larger tables.
+    crosstab = c(list(conditional_props = plot_conditional_props(result)),
+                 if (any(dim(result$tables$counts) > 2)) list(residuals = plot_residuals(result))),
     trend = list(trend = plot_trend(result)),
     stratified = list(stratified = plot_stratified(result)),
     list())

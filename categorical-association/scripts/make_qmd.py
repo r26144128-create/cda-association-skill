@@ -169,6 +169,9 @@ if analysis == "crosstab":
         piece = "effect_cc.qmd" if spec.get("design") == "case-control" else "effect.qmd"
         pieces.append(fill(piece, {"success": success, "conf": conf}))
     pieces.append(fill("plot.qmd", {"x_q": q(x), "y_q": q(y)}))
+    # same rule as run_analysis.py: the residual heat map only for tables larger than 2×2
+    if len(as_list(result["tables"]["counts"]["rows"])) > 2 or len(as_list(result["tables"]["counts"]["cols"])) > 2:
+        pieces.append(fill("plot_residuals.qmd", {"x_q": q(x), "y_q": q(y)}))
 elif analysis == "trend":
     notes = result["notes"]
     ca = notes["trend_type"] == "cochran_armitage"
@@ -181,7 +184,8 @@ elif analysis == "trend":
         "trend_name": "Cochran–Armitage 趨勢檢定" if ca else "Linear-by-linear association 檢定"}))
     if spec.get("x_scores") is not None or spec.get("y_scores") is not None:
         pieces.append(fill("trend_sensitivity.qmd", {"v_equal": "v" if ca else "seq_len(ncol(tab))"}))
-    pieces.append(fill("plot.qmd", {"x_q": q(x), "y_q": q(y)}))
+    pieces.append(fill("plot_trend.qmd", {"success": success, "x_q": q(x)}) if ca
+                  else fill("plot.qmd", {"x_q": q(x), "y_q": q(y)}))
 else:
     pieces.append(fill("stratified.qmd", {"formula": formula, "success": success, "conf": conf}))
     pieces.append(fill("plot_stratified.qmd", {"x_q": q(x), "y_q": q(y), "z_q": q(z)}))

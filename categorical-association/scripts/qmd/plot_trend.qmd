@@ -1,0 +1,16 @@
+
+## 圖
+
+```{r}
+# 各順序類別中「成功」的比例；點越大，人數越多
+d <- data.frame(x = factor(rownames(tab), levels = rownames(tab)),
+                prop = as.numeric(tab[, {{success}}] / rowSums(tab)), n = as.numeric(rowSums(tab)))
+ggplot(d, aes(x = x, y = prop, group = 1)) +
+  geom_line(colour = "grey60") +
+  geom_point(aes(size = n), colour = "#1f3a5f") +
+  geom_text(aes(label = scales::percent(prop, accuracy = 0.01)), vjust = -1.2) +
+  scale_y_continuous(labels = scales::percent, expand = expansion(mult = c(0.05, 0.25))) +
+  scale_size(range = c(2.5, 8), guide = "none") +
+  labs(x = {{x_q}}, y = "比例") +
+  theme_minimal()
+```

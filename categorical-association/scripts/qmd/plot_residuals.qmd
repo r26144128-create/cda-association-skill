@@ -1,0 +1,15 @@
+
+```{r}
+# 標準化殘差熱圖（§2.4.5）：紅 = 比獨立時預期的多，藍 = 比預期的少；|r| > 2 明顯偏離
+r <- as.data.frame(as.table(ct$stdres))
+names(r) <- c("x", "y", "res")
+lim <- max(3, abs(r$res))
+ggplot(r, aes(x = y, y = x, fill = res)) +
+  geom_tile(colour = "white") +
+  geom_text(aes(label = sprintf("%.2f", res), colour = abs(res) > 0.6 * lim), size = 5) +
+  scale_colour_manual(values = c(`FALSE` = "black", `TRUE` = "white"), guide = "none") +
+  scale_fill_gradient2(low = "#2166ac", mid = "white", high = "#b2182b", limits = c(-lim, lim)) +
+  labs(x = {{y_q}}, y = {{x_q}}, fill = "標準化殘差") +
+  theme_minimal() +
+  theme(panel.grid = element_blank())
+```

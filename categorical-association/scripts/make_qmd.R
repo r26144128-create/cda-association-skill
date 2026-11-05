@@ -121,6 +121,10 @@ if (analysis == "crosstab") {
     pieces <- c(pieces, fill(piece, list(success = success, conf = conf)))
   }
   pieces <- c(pieces, fill("plot.qmd", list(x_q = q(x), y_q = q(y))))
+  # same rule as cda_plots(): the residual heat map only for tables larger than 2×2
+  if (length(result$tables$counts$rows) > 2 || length(result$tables$counts$cols) > 2) {
+    pieces <- c(pieces, fill("plot_residuals.qmd", list(x_q = q(x), y_q = q(y))))
+  }
 } else if (analysis == "trend") {
   ca <- result$notes$trend_type == "cochran_armitage"
   v <- if (ca) sprintf("as.numeric(colnames(tab) == %s)   # %s：成功 = 1，其他 = 0", success, y)
@@ -131,7 +135,8 @@ if (analysis == "crosstab") {
   if (!is.null(spec$x_scores) || !is.null(spec$y_scores)) {
     pieces <- c(pieces, fill("trend_sensitivity.qmd", list(v_equal = if (ca) "v" else "seq_len(ncol(tab))")))
   }
-  pieces <- c(pieces, fill("plot.qmd", list(x_q = q(x), y_q = q(y))))
+  pieces <- c(pieces, if (ca) fill("plot_trend.qmd", list(success = success, x_q = q(x)))
+                      else fill("plot.qmd", list(x_q = q(x), y_q = q(y))))
 } else {
   pieces <- c(pieces, fill("stratified.qmd", list(formula = formula, success = success, conf = conf)),
               fill("plot_stratified.qmd", list(x_q = q(x), y_q = q(y), z_q = q(z))))
